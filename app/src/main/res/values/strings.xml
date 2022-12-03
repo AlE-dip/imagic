@@ -1,0 +1,32 @@
+<resources>
+    <string name="app_name">Imagic</string>
+    <string name="gallery">Thư Viện</string>
+    <string name="camera">Camera</string>
+    <string name="video">Video</string>
+    <string name="album">Album</string>
+    <string name="filter">Hiệu Ứng</string>
+    <string name="light">Ánh Sáng</string>
+    <string name="color">Màu Sắc</string>
+    <string name="binary_image">Ảnh Nhị Phân</string>
+    <string name="gray_image">Ảnh Xám</string>
+    <string name="gaussian_blur_image">Làm Mờ</string>
+    <string name="light_balance_gamma">Làm Sáng</string>
+    <string name="default_image">Mặc Định</string>
+    <string name="thresh">Ngưỡng</string>
+    <string name="maxval">Sáng/Tối</string>
+    <string name="opacity">Độ Mờ</string>
+    <string name="sigma_x">sigmaX</string>
+    <string name="brightness">Độ Sáng</string>
+    <string name="dark_image">Làm Tối</string>
+    <string name="darkness">Độ Tối</string>
+    <string name="delete_color">Xóa Màu</string>
+    <string name="delete_blur">Lam</string>
+    <string name="delete_red">Đỏ</string>
+    <string name="delete_green">Lục</string>
+    <string name="detect_eye">Chỉnh Mắt</string>
+    <string name="draw_face">Vẽ Mặt</string>
+    <string name="edit_eye">Chỉnh Mắt</string>
+    <string name="size_zoom">Độ Lớn</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+</resources>
