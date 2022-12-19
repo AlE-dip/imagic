@@ -10,6 +10,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import android.os.Build;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.ale.imagic.model.adapter.AlbumAdapter;
@@ -18,11 +19,12 @@ import com.ale.imagic.model.adapter.GridImageAdapter;
 
 public class ChosePictureActivity extends AppCompatActivity {
 
-    private TextView txTitleAlbum;
-    public ConstraintLayout ctListAlbum;
+    private TextView txAlbum;
+    public ConstraintLayout ctListAlbum, ctTitleAlbum;
     public RecyclerView rcListAlbum, rcListImage;
     private AlbumAdapter albumAdapter;
     private GridImageAdapter gridImageAdapter;
+    public ImageView imBack, imDirection;
 
     @RequiresApi(api = Build.VERSION_CODES.R)
     @Override
@@ -53,19 +55,27 @@ public class ChosePictureActivity extends AppCompatActivity {
 
 
     private void createView() {
-        txTitleAlbum = findViewById(R.id.txTitleAlbum);
+        ctTitleAlbum = findViewById(R.id.ctAlbum);
         ctListAlbum = findViewById(R.id.ctListAlbum);
         rcListAlbum = findViewById(R.id.rcListAlbum);
         rcListImage = findViewById(R.id.rcListImage);
+        imBack = findViewById(R.id.imBack);
+        imDirection = findViewById(R.id.imDirection);
+        txAlbum = findViewById(R.id.txTitleAlbum);
     }
 
     private void setActionView() {
-        txTitleAlbum.setOnClickListener((view) -> {
+        ctTitleAlbum.setOnClickListener((view) -> {
             if (ctListAlbum.getVisibility() == View.VISIBLE) {
                 ctListAlbum.setVisibility(View.GONE);
+                imDirection.setImageResource(R.drawable.down);
             } else {
                 ctListAlbum.setVisibility(View.VISIBLE);
+                imDirection.setImageResource(R.drawable.up);
             }
+        });
+        imBack.setOnClickListener(view -> {
+            finish();
         });
     }
 

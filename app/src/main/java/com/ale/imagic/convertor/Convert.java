@@ -126,8 +126,7 @@ public class Convert {
         if (cacheFilter.getChangeImage() != null) {
             Mat mat = new Mat();
             Utils.bitmapToMat(bitmap, mat);
-            Mat dst = new Mat(mat.size(), mat.type());
-            cacheFilter.getChangeImage().Filter(mat, dst, cacheFilter.getConfigFilter());
+            Mat dst = cacheFilter.getChangeImage().Filter(mat, cacheFilter.getConfigFilter());
             return Convert.createBitmapFromMat(dst);
         } else {
             return bitmap;

@@ -15,20 +15,20 @@
         android:layout_marginTop="5dp"
         android:layout_marginBottom="5dp"
         android:id="@+id/imImage"
-        android:layout_width="100dp"
-        android:layout_height="100dp"/>
+        android:layout_width="70dp"
+        android:layout_height="70dp"/>
 
     <ImageView
         android:id="@+id/imConfig"
         android:background="#6DA5A5A5"
-        android:src="@drawable/plus"
+        android:src="@drawable/settings"
         android:visibility="gone"
         app:layout_constraintTop_toTopOf="@+id/imImage"
         app:layout_constraintLeft_toLeftOf="@id/imImage"
         app:layout_constraintRight_toRightOf="@id/imImage"
         app:layout_constraintBottom_toBottomOf="@id/imImage"
-        android:layout_width="100dp"
-        android:layout_height="100dp"/>
+        android:layout_width="70dp"
+        android:layout_height="70dp"/>
 
     <TextView
         android:id="@+id/txName"

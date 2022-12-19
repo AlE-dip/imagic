@@ -72,8 +72,16 @@ public class AlbumAdapter extends RecyclerView.Adapter<AlbumAdapter.ViewHolder> 
                 context.rcListImage.setAdapter(gridImageAdapter);
                 context.rcListImage.setLayoutManager(new GridLayoutManager(context, 3));
                 context.ctListAlbum.setVisibility(View.GONE);
+                changeImageDirection();
             }
         });
+    }
+
+    private void changeImageDirection(){
+        if(context instanceof ChosePictureActivity){
+            ChosePictureActivity chosePictureActivity = context;
+            chosePictureActivity.imDirection.setImageResource(R.drawable.down);
+        }
     }
 
     @Override

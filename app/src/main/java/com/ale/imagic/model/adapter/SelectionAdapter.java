@@ -58,7 +58,7 @@ public class SelectionAdapter extends RecyclerView.Adapter<SelectionAdapter.View
                     cacheViewCLick = holder;
                 }
                 holder.isClick = true;
-                holder.txSelector.setBackgroundColor(context.getColor(R.color.gray));
+                holder.txSelector.setBackgroundResource(R.drawable.dark_chip);
 
                 cacheFilter.getConfigFilter().setSelected(selection.value);
 

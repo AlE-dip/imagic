@@ -3,7 +3,8 @@
     <string name="gallery">Thư Viện</string>
     <string name="camera">Camera</string>
     <string name="video">Video</string>
-    <string name="album">Album</string>
+    <string name="all_albums">Tất cả album</string>
+    <string name="albums">Album</string>
     <string name="filter">Hiệu Ứng</string>
     <string name="light">Ánh Sáng</string>
     <string name="color">Màu Sắc</string>
@@ -27,6 +28,19 @@
     <string name="draw_face">Vẽ Mặt</string>
     <string name="edit_eye">Chỉnh Mắt</string>
     <string name="size_zoom">Độ Lớn</string>
+    <string name="histogram_index">Sáng - Tối</string>
+    <string name="histogram">Histogram</string>
+    <string name="blue">Lam</string>
+    <string name="green">Lục</string>
+    <string name="red">Đỏ</string>
+    <string name="yellow">Vàng</string>
+    <string name="violet">Tím</string>
+    <string name="dark_green">Lục đậm</string>
+    <string name="negative">Âm bản</string>
+    <string name="contour">Đường viền</string>
+    <string name="shaping">Làm nét</string>
+    <string name="emboss">Emboss</string>
+    <string name="emboss_value">Nổi</string>
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
 </resources>

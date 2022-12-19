@@ -7,21 +7,63 @@ import org.opencv.core.Core;
 import org.opencv.core.CvType;
 import org.opencv.core.Mat;
 import org.opencv.core.Size;
+import org.opencv.imgcodecs.Imgcodecs;
 import org.opencv.imgproc.Imgproc;
 
+import java.util.ArrayList;
+
 public class Filter {
+    public static final int RED = 0;
+    public static final int GREEN = 1;
+    public static final int BLUE = 2;
+    public static final int YELLOW = 3;
+    public static final int VIOLET = 4;
+    public static final int DARK_GREEN = 5;
 
     //f1 = 0, f2 = 1, f3 = 2
-    public static void deleteColor(Mat src, int BGR) {
+    public static void deleteColor(Mat src, Mat dst, int BGR) {
         //Xoa mau
         //B=0;G=1;R=2 ung vs BGR
         for (int i = 0; i < src.rows(); i++) {
             for (int j = 0; j < src.cols(); j++) {
                 double point[] = src.get(i, j);
                 point[BGR] = 0;
-                src.put(i, j, point);
+                dst.put(i, j, point);
             }
         }
+    }
+
+    public static void removeColor(Mat src, Mat dst, int color) {
+        //Xoa mau
+        //B=0;G=1;R=2 ung vs BGR
+        ArrayList<Mat> srcSplit = new ArrayList<>();
+        Core.split(src, srcSplit);
+        Mat zero = Mat.zeros(src.size(), CvType.CV_8UC1);
+        switch (color) {
+            case RED:
+                srcSplit.set(GREEN, zero);
+                srcSplit.set(BLUE, zero);
+                break;
+            case GREEN:
+                srcSplit.set(BLUE, zero);
+                srcSplit.set(RED, zero);
+                break;
+            case BLUE:
+                srcSplit.set(GREEN, zero);
+                srcSplit.set(RED, zero);
+                break;
+            case YELLOW:
+                srcSplit.set(BLUE, zero);
+                break;
+            case VIOLET:
+                srcSplit.set(GREEN, zero);
+                break;
+            case DARK_GREEN:
+                srcSplit.set(RED, zero);
+                break;
+        }
+
+        Core.merge(srcSplit, dst);
     }
 
     public static Mat tableColor() {
@@ -166,26 +208,7 @@ public class Filter {
         return kernel;
     }
 
-    public static Mat filterSharpening(Mat src) {
-        Imgproc.filter2D(src, src, src.depth(), kernelSharpening());
-        return src;
-    }
-
-    private static Mat kernelSharpening() {
-        Mat kernel = new Mat(3, 3, CvType.CV_16S);
-        kernel.put(0, 0,
-                0, -1, 0,
-                -1, 5, -1,
-                0, -1, 0);
-        return kernel;
-    }
-
-    public static Mat filterMedianBlurring(Mat src) {
-        Imgproc.filter2D(src, src, src.depth(), kernelMedianBlurring());
-        return src;
-    }
-
-    private static Mat kernelMedianBlurring() {
+    public static Mat kernelShaping() {
         Mat kernel = new Mat(3, 3, CvType.CV_16S);
         kernel.put(0, 0,
                 0, -1, 0,
@@ -205,6 +228,24 @@ public class Filter {
                 -1, -1, -1,
                 -1, 9, -1,
                 -1, -1, -1);
+        return kernel;
+    }
+
+    public static Mat kernelBlackLine() {
+        Mat kernel = new Mat(3, 3, CvType.CV_16S);
+        kernel.put(0, 0,
+                -1, -1, -1,
+                -1, 8, -1,
+                -1, -1, -1);
+        return kernel;
+    }
+
+    public static Mat kernelEmboss (int emboss) {
+        Mat kernel = new Mat(3, 3, CvType.CV_16S);
+        kernel.put(0, 0,
+                -emboss, -emboss / 2, 0,
+                -emboss / 2, 1, emboss / 2,
+                0, emboss / 2, emboss);
         return kernel;
     }
 
