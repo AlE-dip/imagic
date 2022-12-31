@@ -121,53 +121,53 @@ public class ListFilterFragment extends Fragment {
             return dst;
         }));
 
-        //Histogram
-        ConfigFilter cfHistogram = new ConfigFilter();
-//        cfHistogram.createSeekBar(50, 0, 255, context.getString(R.string.thresh));
-//        cfHistogram.createSeekBar(0, 0, 255, context.getString(R.string.histogram_index));
-        cfHistogram.selected = 0;
-        cfHistogram.createSelection(3, "All");
-        cfHistogram.createSelection(0, "red");
-        cfHistogram.createSelection(1, "green");
-        cfHistogram.createSelection(2, "blue");
-        cacheFilters.add(new CacheFilter(context.getString(R.string.histogram), cfHistogram, (mat, cfFilter) -> {
-            Mat histogram = new Mat(mat.size(), mat.type());
-
-            Size rgbaSize = mat.size();
-            int histSize = 256;
-            MatOfInt histogramSize = new MatOfInt(histSize);
-
-            int histogramHeight = (int) rgbaSize.height;
-            int binWidth = 5;
-
-            MatOfFloat histogramRange = new MatOfFloat(0f, 256f);
-
-            Scalar[] colorsRgb = new Scalar[]{new Scalar(200, 0, 0, 255), new Scalar(0, 200, 0, 255), new Scalar(0, 0, 200, 255)};
-            MatOfInt[] channels = new MatOfInt[]{new MatOfInt(0), new MatOfInt(1), new MatOfInt(2)};
-
-            Mat[] histograms = new Mat[]{new Mat(), new Mat(), new Mat()};
-
-            if(cfFilter.selected == 3){
-                for (int i = 0; i < channels.length; i++) {
-                    Imgproc.calcHist(Collections.singletonList(mat), channels[i], new Mat(), histograms[i], histogramSize, histogramRange);
-                    Core.normalize(histograms[i], histograms[i], histogramHeight, 0, Core.NORM_INF);
-                    for (int j = 0; j < histSize; j++) {
-                        Point p1 = new Point(binWidth * (j - 1), histogramHeight - Math.round(histograms[i].get(j - 1, 0)[0]));
-                        Point p2 = new Point(binWidth * j, histogramHeight - Math.round(histograms[i].get(j, 0)[0]));
-                        Imgproc.line(mat, p1, p2, colorsRgb[i], 2, 8, 0);
-                    }
-                }
-            } else {
-                Imgproc.calcHist(Collections.singletonList(mat), channels[cfFilter.selected], new Mat(), histograms[cfFilter.selected], histogramSize, histogramRange);
-                Core.normalize(histograms[cfFilter.selected], histograms[cfFilter.selected], histogramHeight, 0, Core.NORM_INF);
-                for (int j = 0; j < histSize; j++) {
-                    Point p1 = new Point(binWidth * (j - 1), histogramHeight - Math.round(histograms[cfFilter.selected].get(j - 1, 0)[0]));
-                    Point p2 = new Point(binWidth * j, histogramHeight - Math.round(histograms[cfFilter.selected].get(j, 0)[0]));
-                    Imgproc.line(mat, p1, p2, colorsRgb[cfFilter.selected], 2, 8, 0);
-                }
-            }
-            return mat;
-        }));
+//        //Histogram
+//        ConfigFilter cfHistogram = new ConfigFilter();
+////        cfHistogram.createSeekBar(50, 0, 255, context.getString(R.string.thresh));
+////        cfHistogram.createSeekBar(0, 0, 255, context.getString(R.string.histogram_index));
+//        cfHistogram.selected = 0;
+//        cfHistogram.createSelection(3, "All");
+//        cfHistogram.createSelection(0, "red");
+//        cfHistogram.createSelection(1, "green");
+//        cfHistogram.createSelection(2, "blue");
+//        cacheFilters.add(new CacheFilter(context.getString(R.string.histogram), cfHistogram, (mat, cfFilter) -> {
+//            Mat histogram = new Mat(mat.size(), mat.type());
+//
+//            Size rgbaSize = mat.size();
+//            int histSize = 256;
+//            MatOfInt histogramSize = new MatOfInt(histSize);
+//
+//            int histogramHeight = (int) rgbaSize.height;
+//            int binWidth = 5;
+//
+//            MatOfFloat histogramRange = new MatOfFloat(0f, 256f);
+//
+//            Scalar[] colorsRgb = new Scalar[]{new Scalar(200, 0, 0, 255), new Scalar(0, 200, 0, 255), new Scalar(0, 0, 200, 255)};
+//            MatOfInt[] channels = new MatOfInt[]{new MatOfInt(0), new MatOfInt(1), new MatOfInt(2)};
+//
+//            Mat[] histograms = new Mat[]{new Mat(), new Mat(), new Mat()};
+//
+//            if(cfFilter.selected == 3){
+//                for (int i = 0; i < channels.length; i++) {
+//                    Imgproc.calcHist(Collections.singletonList(mat), channels[i], new Mat(), histograms[i], histogramSize, histogramRange);
+//                    Core.normalize(histograms[i], histograms[i], histogramHeight, 0, Core.NORM_INF);
+//                    for (int j = 0; j < histSize; j++) {
+//                        Point p1 = new Point(binWidth * (j - 1), histogramHeight - Math.round(histograms[i].get(j - 1, 0)[0]));
+//                        Point p2 = new Point(binWidth * j, histogramHeight - Math.round(histograms[i].get(j, 0)[0]));
+//                        Imgproc.line(mat, p1, p2, colorsRgb[i], 2, 8, 0);
+//                    }
+//                }
+//            } else {
+//                Imgproc.calcHist(Collections.singletonList(mat), channels[cfFilter.selected], new Mat(), histograms[cfFilter.selected], histogramSize, histogramRange);
+//                Core.normalize(histograms[cfFilter.selected], histograms[cfFilter.selected], histogramHeight, 0, Core.NORM_INF);
+//                for (int j = 0; j < histSize; j++) {
+//                    Point p1 = new Point(binWidth * (j - 1), histogramHeight - Math.round(histograms[cfFilter.selected].get(j - 1, 0)[0]));
+//                    Point p2 = new Point(binWidth * j, histogramHeight - Math.round(histograms[cfFilter.selected].get(j, 0)[0]));
+//                    Imgproc.line(mat, p1, p2, colorsRgb[cfFilter.selected], 2, 8, 0);
+//                }
+//            }
+//            return mat;
+//        }));
 
         //Delete color
         ConfigFilter cfDeleteColor = new ConfigFilter();
@@ -225,6 +225,33 @@ public class ListFilterFragment extends Fragment {
 //            Core.inRange(src, new Scalar(100,100,100), new Scalar(255,255,255), dst);
 //            return dst;
 //        }));
+
+        //Custom kernel
+        ConfigFilter configFilter8 = new ConfigFilter();
+        configFilter8.createSeekBar(1, -10, 10, "1");
+        configFilter8.createSeekBar(1, -10, 10, "2");
+        configFilter8.createSeekBar(1, -10, 10, "3");
+        configFilter8.createSeekBar(1, -10, 10, "4");
+        configFilter8.createSeekBar(1, -10, 10, "5");
+        configFilter8.createSeekBar(1, -10, 10, "6");
+        configFilter8.createSeekBar(1, -10, 10, "7");
+        configFilter8.createSeekBar(1, -10, 10, "8");
+        configFilter8.createSeekBar(1, -10, 10, "9");
+        cacheFilters.add(new CacheFilter(context.getString(R.string.custom), configFilter8, (mat, cfFilter) -> {
+            Mat dst = new Mat(mat.size(), mat.type());
+            Imgproc.filter2D(mat, dst, mat.depth(), Filter.customKernel(
+                    cfFilter.seekBars.get(0).value,
+                    cfFilter.seekBars.get(1).value,
+                    cfFilter.seekBars.get(2).value,
+                    cfFilter.seekBars.get(3).value,
+                    cfFilter.seekBars.get(4).value,
+                    cfFilter.seekBars.get(5).value,
+                    cfFilter.seekBars.get(6).value,
+                    cfFilter.seekBars.get(7).value,
+                    cfFilter.seekBars.get(8).value
+            ));
+            return dst;
+        }));
     }
 
     @Override

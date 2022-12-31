@@ -2,6 +2,7 @@
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="wrap_content"
     android:layout_height="match_parent"
+    android:id="@+id/ct_item"
     android:background="@color/black"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
@@ -10,34 +11,22 @@
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintBottom_toTopOf="@+id/txName"
+        app:layout_constraintBottom_toTopOf="@+id/tx_name"
         android:layout_marginLeft="5dp"
         android:layout_marginRight="5dp"
         android:layout_marginTop="5dp"
         android:layout_marginBottom="5dp"
-        android:id="@+id/imImage"
-        android:layout_width="70dp"
-        android:layout_height="70dp"/>
-
-    <ImageView
-        android:id="@+id/imConfig"
-        android:background="#6DA5A5A5"
-        android:src="@drawable/settings"
-        android:visibility="gone"
-        app:layout_constraintTop_toTopOf="@+id/imImage"
-        app:layout_constraintLeft_toLeftOf="@id/imImage"
-        app:layout_constraintRight_toRightOf="@id/imImage"
-        app:layout_constraintBottom_toBottomOf="@id/imImage"
-        android:layout_width="70dp"
-        android:layout_height="70dp"/>
+        android:id="@+id/im_icon"
+        android:layout_width="30dp"
+        android:layout_height="30dp"/>
 
     <TextView
-        android:id="@+id/txName"
+        android:id="@+id/tx_name"
         android:text="Name"
         android:textColor="@color/white"
-        app:layout_constraintLeft_toLeftOf="@+id/imImage"
-        app:layout_constraintRight_toRightOf="@+id/imImage"
-        app:layout_constraintTop_toBottomOf="@id/imImage"
+        app:layout_constraintLeft_toLeftOf="@+id/im_icon"
+        app:layout_constraintRight_toRightOf="@+id/im_icon"
+        app:layout_constraintTop_toBottomOf="@id/im_icon"
         app:layout_constraintBottom_toBottomOf="parent"
         android:layout_marginBottom="5dp"
         android:layout_width="wrap_content"

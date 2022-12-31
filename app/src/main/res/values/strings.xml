@@ -41,6 +41,7 @@
     <string name="shaping">Làm nét</string>
     <string name="emboss">Emboss</string>
     <string name="emboss_value">Nổi</string>
+    <string name="custom">Tùy chỉnh</string>
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
 </resources>
