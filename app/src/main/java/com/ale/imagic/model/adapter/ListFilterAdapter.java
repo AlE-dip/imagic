@@ -9,6 +9,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -51,21 +52,21 @@ public class ListFilterAdapter extends RecyclerView.Adapter<ListFilterAdapter.Vi
         holder.id = cacheFilter.getId();
         holder.imImage.setImageResource(R.color.black);
         holder.txName.setText(cacheFilter.getName());
-        holder.imConfig.setVisibility(View.GONE);
+        holder.ctConfig.setVisibility(View.GONE);
         holder.imImage.setImageBitmap(Convert.applyEffect(cacheFilter, bitmap));
 
         holder.imImage.setOnClickListener((view) -> {
             imageView.setImageBitmap(Convert.applyEffect(cacheFilter, bitmap));
             this.cacheFilter.setCache(cacheFilter);
-            if (cacheViewClick != null && cacheViewClick.imConfig.getVisibility() == View.VISIBLE) {
-                cacheViewClick.imConfig.setVisibility(View.GONE);
+            if (cacheViewClick != null && cacheViewClick.ctConfig.getVisibility() == View.VISIBLE) {
+                cacheViewClick.ctConfig.setVisibility(View.GONE);
                 rcListConfig.setVisibility(View.GONE);
             }
             cacheViewClick = holder;
             //Set config filter
             if (this.cacheFilter.getConfigFilter() != null) {
-                holder.imConfig.setVisibility(View.VISIBLE);
-                holder.imConfig.setOnClickListener(createListenerConfig(this.cacheFilter));
+                holder.ctConfig.setVisibility(View.VISIBLE);
+                holder.ctConfig.setOnClickListener(createListenerConfig(this.cacheFilter));
             }
         });
     }
@@ -95,7 +96,8 @@ public class ListFilterAdapter extends RecyclerView.Adapter<ListFilterAdapter.Vi
     public class ViewHolder extends RecyclerView.ViewHolder {
 
         long id;
-        ImageView imImage, imConfig;
+        ImageView imImage;
+        ConstraintLayout ctConfig;
         TextView txName;
 
         public ViewHolder(@NonNull View itemView) {
@@ -103,7 +105,7 @@ public class ListFilterAdapter extends RecyclerView.Adapter<ListFilterAdapter.Vi
             id = -111;
             imImage = itemView.findViewById(R.id.imImage);
             txName = itemView.findViewById(R.id.txName);
-            imConfig = itemView.findViewById(R.id.imConfig);
+            ctConfig = itemView.findViewById(R.id.ct_config);
         }
     }
 }

@@ -10,6 +10,7 @@ import android.widget.ImageView;
 import androidx.annotation.NonNull;
 
 import com.ale.imagic.MainActivity;
+import com.ale.imagic.model.ContentUtil;
 import com.ale.imagic.model.cache.CacheFilter;
 
 import org.opencv.android.Utils;
@@ -127,8 +128,10 @@ public class Convert {
             Mat mat = new Mat();
             Utils.bitmapToMat(bitmap, mat);
             Mat dst = cacheFilter.getChangeImage().Filter(mat, cacheFilter.getConfigFilter());
+            ContentUtil.saveImage = dst;
             return Convert.createBitmapFromMat(dst);
         } else {
+            Utils.bitmapToMat(bitmap, ContentUtil.saveImage);
             return bitmap;
         }
     }

@@ -28,6 +28,7 @@ import java.util.Queue;
 
 public class MainActivity extends AppCompatActivity {
 
+    public static final String LOCATION = "Imagic";
     public static String FACE_DETECTION = "FaceDetection";
     private ImageView imPicture;
     private BottomNavigationView navigationBar;

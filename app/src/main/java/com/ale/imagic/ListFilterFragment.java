@@ -39,16 +39,16 @@ public class ListFilterFragment extends Fragment {
 
     private Context context;
     private ArrayList<CacheFilter> cacheFilters;
-    private Bitmap bitmap;
+    private Bitmap cacheBitmap;
     private RecyclerView rcListFilter, rcListConfig;
     private ListFilterAdapter listFilterAdapter;
     private ImageView imageView;
     private CacheFilter cacheFilter;
     private Mat avatar;
 
-    public ListFilterFragment(Context context, Bitmap bitmap, CacheFilter cacheFilter, ImageView imageView) {
+    public ListFilterFragment(Context context, Bitmap cacheBitmap, CacheFilter cacheFilter, ImageView imageView) {
         this.context = context;
-        this.bitmap = bitmap;
+        this.cacheBitmap = cacheBitmap;
         this.imageView = imageView;
         this.cacheFilter = cacheFilter;
         createOperations();
@@ -265,7 +265,7 @@ public class ListFilterFragment extends Fragment {
 
         rcListFilter = view.findViewById(R.id.rcListFilter);
         rcListConfig = view.findViewById(R.id.rcListConfig);
-        listFilterAdapter = new ListFilterAdapter(cacheFilters, cacheFilter, context, bitmap, imageView, rcListConfig);
+        listFilterAdapter = new ListFilterAdapter(cacheFilters, cacheFilter, context, cacheBitmap, imageView, rcListConfig);
         rcListFilter.setAdapter(listFilterAdapter);
         rcListFilter.setLayoutManager(new LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false));
     }
