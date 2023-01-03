@@ -1,6 +1,7 @@
 package com.ale.imagic;
 
 import androidx.annotation.RequiresApi;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
@@ -12,18 +13,16 @@ import android.graphics.Bitmap;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
-import android.util.Log;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
+import android.widget.Toast;
 
 import com.ale.imagic.convertor.Convert;
-import com.ale.imagic.model.ContentUtil;
+import com.ale.imagic.model.ContentShare;
 import com.ale.imagic.model.adapter.FeatureAdapter;
 import com.ale.imagic.model.cache.CacheFilter;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
-import org.opencv.android.Utils;
-import org.opencv.core.Core;
 import org.opencv.core.CvType;
 import org.opencv.core.Mat;
 import org.opencv.imgcodecs.Imgcodecs;
@@ -56,6 +55,7 @@ public class EditPictureActivity extends AppCompatActivity {
         pathImage = intent.getStringExtra("path");
 
         cacheBitmap = Convert.readImage(pathImage);
+        ContentShare.saveImage = Convert.createMatFromBitmap(cacheBitmap);
         imEditPicture.setImageBitmap(cacheBitmap);
 
         //
@@ -118,19 +118,28 @@ public class EditPictureActivity extends AppCompatActivity {
     }
 
     private void saveImage() {
-        String root = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES).toString();
-        File file = new File(root, MainActivity.LOCATION);
-        if (!file.exists()) {
-            file.mkdir();
-        }
-        File image = new File(pathImage);
-        String nameImage = image.getName();
-        File imageSave = new File(file, nameImage);
-        if (imageSave.exists ()) imageSave.delete ();
-        if(ContentUtil.saveImage != null){
-            Imgproc.cvtColor(ContentUtil.saveImage, ContentUtil.saveImage, Imgproc.COLOR_RGB2BGRA);
-            Imgcodecs.imwrite(imageSave.toString(), ContentUtil.saveImage);
-        }
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle(getString(R.string.download));
+        builder.setMessage(getString(R.string.view_ads));
+        builder.setNegativeButton(R.string.cancel, (dialogInterface, i) -> {
+            dialogInterface.cancel();
+        });
+        builder.setPositiveButton(R.string.download, (dialogInterface, i) -> {
+            String root = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES).toString();
+            File file = new File(root, MainActivity.LOCATION);
+            if (!file.exists()) {
+                file.mkdir();
+            }
+            File image = new File(pathImage);
+            String nameImage = MainActivity.LOCATION + "_" +image.getName();
+            File imageSave = new File(file, nameImage);
+            if (imageSave.exists()) imageSave.delete();
+            Mat save = new Mat();
+            Imgproc.cvtColor(ContentShare.saveImage, save, Imgproc.COLOR_RGB2BGRA);
+            Imgcodecs.imwrite(imageSave.toString(), save);
+            Toast.makeText(this, R.string.downloaded, Toast.LENGTH_LONG).show();
+        });
+        builder.show();
     }
 
     private void createEvent() {

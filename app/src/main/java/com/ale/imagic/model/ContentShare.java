@@ -1,5 +1,7 @@
 package com.ale.imagic.model;
 
+import org.opencv.core.Mat;
+
 public class ContentShare {
     private static long maxId = 0;
 
@@ -7,4 +9,7 @@ public class ContentShare {
         maxId++;
         return maxId;
     }
+
+    //image after apply filter
+    public static Mat saveImage;
 }

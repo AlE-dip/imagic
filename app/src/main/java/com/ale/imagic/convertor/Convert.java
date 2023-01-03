@@ -2,19 +2,14 @@ package com.ale.imagic.convertor;
 
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.graphics.ImageFormat;
 import android.graphics.PointF;
 import android.util.Log;
-import android.widget.ImageView;
-
-import androidx.annotation.NonNull;
 
 import com.ale.imagic.MainActivity;
-import com.ale.imagic.model.ContentUtil;
+import com.ale.imagic.model.ContentShare;
 import com.ale.imagic.model.cache.CacheFilter;
 
 import org.opencv.android.Utils;
-import org.opencv.core.Core;
 import org.opencv.core.CvType;
 import org.opencv.core.Mat;
 import org.opencv.core.MatOfPoint;
@@ -24,7 +19,6 @@ import org.opencv.core.Size;
 import org.opencv.imgcodecs.Imgcodecs;
 import org.opencv.imgproc.Imgproc;
 
-import java.nio.ByteBuffer;
 import java.util.List;
 
 public class Convert {
@@ -63,6 +57,12 @@ public class Convert {
         Bitmap bitmap = Bitmap.createBitmap(mat.cols(), mat.rows(), Bitmap.Config.ARGB_8888);
         Utils.matToBitmap(mat, bitmap);
         return bitmap;
+    }
+
+    public static Mat createMatFromBitmap(Bitmap bitmap) {
+        Mat mat = new Mat();
+        Utils.bitmapToMat(bitmap, mat);
+        return mat;
     }
 
     public static void resize(Mat mat, int size) {
@@ -128,10 +128,10 @@ public class Convert {
             Mat mat = new Mat();
             Utils.bitmapToMat(bitmap, mat);
             Mat dst = cacheFilter.getChangeImage().Filter(mat, cacheFilter.getConfigFilter());
-            ContentUtil.saveImage = dst;
+            ContentShare.saveImage = dst;
             return Convert.createBitmapFromMat(dst);
         } else {
-            Utils.bitmapToMat(bitmap, ContentUtil.saveImage);
+            Utils.bitmapToMat(bitmap, ContentShare.saveImage);
             return bitmap;
         }
     }
