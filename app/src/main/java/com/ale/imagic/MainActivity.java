@@ -3,6 +3,8 @@ package com.ale.imagic;
 import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import android.app.Activity;
 import android.content.Intent;
@@ -10,12 +12,17 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.MenuItem;
+import android.view.View;
 import android.view.WindowInsets;
 import android.view.WindowInsetsController;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 
 import com.ale.imagic.model.Album;
+import com.ale.imagic.model.adapter.ImageAutoSizeAdapter;
+import com.ale.imagic.model.cache.CacheImage;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 import org.opencv.android.OpenCVLoader;
@@ -28,13 +35,12 @@ import java.util.Queue;
 
 public class MainActivity extends AppCompatActivity {
 
-    public static final String LOCATION = "Imagic";
     public static String FACE_DETECTION = "FaceDetection";
-    private ImageView imPicture;
     private BottomNavigationView navigationBar;
     public static ArrayList<Album> albums;
     private static boolean isSetAlbums;
     public static FinishSetAlbum finishSetAlbum;
+    private RecyclerView rcImageLeft, rcImageRight;
 
     static {
         if (OpenCVLoader.initDebug()) {
@@ -64,18 +70,45 @@ public class MainActivity extends AppCompatActivity {
 
     public void startGetFile() {
         new Thread(new Runnable() {
+            @RequiresApi(api = Build.VERSION_CODES.N)
             @Override
             public void run() {
                 File path = Environment.getExternalStorageDirectory();
                 getListAlbum(path, albums);
                 setFinishSetAlbum(null);
+                getSelfAlbum();
             }
         }).start();
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.N)
+    private void getSelfAlbum() {
+        albums.forEach(album -> {
+            if(album.getName().equals(UtilContains.LOCATION)){
+                ArrayList<CacheImage> cacheImageLefts = new ArrayList<>();
+                ArrayList<CacheImage> cacheImageRights = new ArrayList<>();
+                for (int i = 0; i < album.getCacheImages().size(); i++){
+                    CacheImage cacheImage = album.getCacheImages().get(i);
+                    if(i % 2 == 0){
+                        cacheImageLefts.add(cacheImage);
+                    } else {
+                        cacheImageRights.add(cacheImage);
+                    }
+                }
+                ImageAutoSizeAdapter imageAutoSizeAdapterLeft = new ImageAutoSizeAdapter(this, cacheImageLefts);
+                rcImageLeft.setAdapter(imageAutoSizeAdapterLeft);
+                rcImageLeft.setLayoutManager(new LinearLayoutManager(this, RecyclerView.VERTICAL, false));
+                ImageAutoSizeAdapter imageAutoSizeAdapterRight = new ImageAutoSizeAdapter(this, cacheImageRights);
+                rcImageRight.setAdapter(imageAutoSizeAdapterRight);
+                rcImageRight.setLayoutManager(new LinearLayoutManager(this, RecyclerView.VERTICAL, false));
+            }
+        });
+    }
+
     private void createView() {
-        imPicture = findViewById(R.id.im_picture);
         navigationBar = findViewById(R.id.navigation_bar);
+        rcImageLeft = findViewById(R.id.rc_image_left);
+        rcImageRight = findViewById(R.id.rc_image_right);
     }
 
     private void setActionView() {

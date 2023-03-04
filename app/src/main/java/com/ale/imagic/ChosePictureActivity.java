@@ -15,6 +15,9 @@ import android.widget.TextView;
 
 import com.ale.imagic.model.adapter.AlbumAdapter;
 import com.ale.imagic.model.adapter.GridImageAdapter;
+import com.ale.imagic.model.cache.CacheImage;
+
+import java.util.ArrayList;
 
 
 public class ChosePictureActivity extends AppCompatActivity {
@@ -47,7 +50,8 @@ public class ChosePictureActivity extends AppCompatActivity {
         rcListAlbum.setAdapter(albumAdapter);
         rcListAlbum.setLayoutManager(new LinearLayoutManager(this));
 
-        gridImageAdapter = new GridImageAdapter(MainActivity.albums.get(0).getCacheImages(), this);
+        ArrayList<CacheImage> cacheImages = MainActivity.albums.size() != 0 ? MainActivity.albums.get(0).getCacheImages() : new ArrayList<>();
+        gridImageAdapter = new GridImageAdapter(cacheImages, this);
         rcListImage.setAdapter(gridImageAdapter);
         rcListImage.setLayoutManager(new GridLayoutManager(this, 3));
 

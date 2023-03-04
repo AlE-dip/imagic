@@ -2,8 +2,6 @@ package com.ale.imagic.model.adapter;
 
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.Bitmap;
-import android.util.Size;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -14,49 +12,42 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.ale.imagic.EditPictureActivity;
 import com.ale.imagic.R;
-import com.ale.imagic.convertor.Convert;
 import com.ale.imagic.convertor.Handle;
 import com.ale.imagic.model.cache.CacheImage;
 
 import java.util.ArrayList;
 
-public class GridImageAdapter extends RecyclerView.Adapter<GridImageAdapter.ViewHolder> {
+public class ImageAutoSizeAdapter extends RecyclerView.Adapter<ImageAutoSizeAdapter.ViewHolder> {
 
-    private ArrayList<CacheImage> cacheImages;
     private Context context;
+    private ArrayList<CacheImage> cacheImages;
 
-    public GridImageAdapter(ArrayList<CacheImage> cacheImages, Context context) {
-        this.cacheImages = cacheImages;
+    public ImageAutoSizeAdapter(Context context, ArrayList<CacheImage> cacheImages) {
         this.context = context;
+        this.cacheImages = cacheImages;
     }
 
     @NonNull
     @Override
-    public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(parent.getContext())
-                .inflate(R.layout.item_image, parent, false);
+    public ImageAutoSizeAdapter.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+        View view = LayoutInflater.from(context).inflate(R.layout.item_image_auto_size, parent, false);
         return new ViewHolder(view);
     }
 
     @Override
-    public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
-
+    public void onBindViewHolder(@NonNull ImageAutoSizeAdapter.ViewHolder holder, int position) {
         CacheImage cacheImage = cacheImages.get(position);
-        holder.id = cacheImage.getId();
-        holder.imImage.setImageResource(R.color.white);
 
-        Handle.loadCacheImage(cacheImage, new Size(200, 200), bitmap -> {
-            holder.imImage.post(new Runnable() {
+        Handle.loadCacheImage(cacheImage, null, bitmap -> {
+            holder.imAutoSize.post(new Runnable() {
                 @Override
                 public void run() {
-                    if (holder.id == cacheImage.getId()) {
-                        holder.imImage.setImageBitmap(bitmap);
-                    }
+                    holder.imAutoSize.setImageBitmap(bitmap);
                 }
             });
         });
 
-        holder.imImage.setOnClickListener(new View.OnClickListener() {
+        holder.imAutoSize.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 Intent intent = new Intent(context, EditPictureActivity.class);
@@ -73,13 +64,11 @@ public class GridImageAdapter extends RecyclerView.Adapter<GridImageAdapter.View
 
     public class ViewHolder extends RecyclerView.ViewHolder {
 
-        long id;
-        ImageView imImage;
+        ImageView imAutoSize;
 
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
-            id = -111;
-            imImage = itemView.findViewById(R.id.imImage);
+            imAutoSize = itemView.findViewById(R.id.im_auto_size);
         }
     }
 }

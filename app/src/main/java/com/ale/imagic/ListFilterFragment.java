@@ -184,6 +184,31 @@ public class ListFilterFragment extends Fragment {
             return dst;
         }));
 
+        //Color 2
+        ConfigFilter configFilterColor = new ConfigFilter();
+        configFilterColor.createSeekBar(0, 0, 200, "H");
+        configFilterColor.createSeekBar(100, 0, 200, "S");
+        configFilterColor.createSeekBar(10, 0, 200, "V");
+        cacheFilters.add(new CacheFilter(context.getString(R.string.color) + " 2", configFilterColor, (mat, cfFilter) -> {
+            // Chuyển đổi màu BGR sang HSV
+            Mat hsv = new Mat();
+            Imgproc.cvtColor(mat, hsv, Imgproc.COLOR_BGR2HSV);
+
+            // Tạo filter chỉnh màu
+            // Thay đổi giá trị H, S, V
+            ArrayList<Mat> channels = new ArrayList<>(3);
+            Core.split(hsv, channels);
+            channels.get(0).convertTo(channels.get(0), -1, 1, cfFilter.seekBars.get(0).value);
+            channels.get(1).convertTo(channels.get(1), -1, 1, cfFilter.seekBars.get(1).value);
+            channels.get(2).convertTo(channels.get(2), -1, 1, cfFilter.seekBars.get(2).value);
+            Core.merge(channels, hsv);
+
+            // Chuyển đổi lại màu HSV sang BGR
+            Imgproc.cvtColor(hsv, mat, Imgproc.COLOR_HSV2BGR);
+
+            return mat;
+        }));
+
         //Negative color
         cacheFilters.add(new CacheFilter(context.getString(R.string.negative), null, (mat, cfFilter) -> {
             Mat dst = new Mat(mat.size(), mat.type());
@@ -196,6 +221,16 @@ public class ListFilterFragment extends Fragment {
             Mat dst = new Mat(mat.size(), mat.type());
             Imgproc.filter2D(mat, dst, mat.depth(), Filter.kernelBlackLine());
             return dst;
+        }));
+
+        //Contour
+        cacheFilters.add(new CacheFilter(context.getString(R.string.delete_contour), null, (mat, cfFilter) -> {
+            Mat dst = new Mat();
+            Mat newDst = new Mat();
+
+            Imgproc.filter2D(mat, dst, mat.depth(), Filter.kernelBlackLine());
+            mat.copyTo(newDst, dst);
+            return newDst;
         }));
 
         //Shaping

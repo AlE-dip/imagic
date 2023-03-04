@@ -126,12 +126,12 @@ public class EditPictureActivity extends AppCompatActivity {
         });
         builder.setPositiveButton(R.string.download, (dialogInterface, i) -> {
             String root = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES).toString();
-            File file = new File(root, MainActivity.LOCATION);
+            File file = new File(root, UtilContains.LOCATION);
             if (!file.exists()) {
                 file.mkdir();
             }
             File image = new File(pathImage);
-            String nameImage = MainActivity.LOCATION + "_" +image.getName();
+            String nameImage = UtilContains.LOCATION + "_" +image.getName();
             File imageSave = new File(file, nameImage);
             if (imageSave.exists()) imageSave.delete();
             Mat save = new Mat();
