@@ -8,11 +8,18 @@ import androidx.fragment.app.FragmentTransaction;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
+import android.text.Editable;
+import android.text.TextWatcher;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.Toast;
@@ -23,8 +30,8 @@ import com.ale.imagic.model.adapter.FeatureAdapter;
 import com.ale.imagic.model.cache.CacheFilter;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
-import org.opencv.core.CvType;
 import org.opencv.core.Mat;
+import org.opencv.core.Size;
 import org.opencv.imgcodecs.Imgcodecs;
 import org.opencv.imgproc.Imgproc;
 
@@ -81,6 +88,7 @@ public class EditPictureActivity extends AppCompatActivity {
             if (!featureFunction.isClick) {
                 //remove this last click
                 removeCacheClick(featureFunction);
+                addResizeDialog();
             } else {
                 removeAllFragment(featureFunction);
             }
@@ -89,6 +97,81 @@ public class EditPictureActivity extends AppCompatActivity {
         FeatureAdapter featureAdapter = new FeatureAdapter(this, featureFunctions);
         rcFooter.setAdapter(featureAdapter);
         rcFooter.setLayoutManager(new LinearLayoutManager(this, RecyclerView.HORIZONTAL, false));
+    }
+
+    @RequiresApi(api = Build.VERSION_CODES.M)
+    private void addResizeDialog() {
+        int width = cacheBitmap.getWidth();
+        int height = cacheBitmap.getHeight();
+        boolean[] isChanged = {false};
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle(getString(R.string.change_size_image));
+
+        LayoutInflater inflater = (LayoutInflater) getApplicationContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        View view = inflater.inflate(R.layout.resize_image_dialog, null);
+        EditText edWidth = view.findViewById(R.id.ed_width);
+        EditText edHeight = view.findViewById(R.id.ed_height);
+        //set size
+        edWidth.setText(width + "");
+        edHeight.setText(height + "");
+
+        edWidth.addTextChangedListener(eventChangeSizeImage(width, height, edHeight, isChanged));
+        edHeight.addTextChangedListener(eventChangeSizeImage(height, width, edWidth, isChanged));
+
+        builder.setView(view);
+
+        // Set up the buttons
+        builder.setPositiveButton(getString(R.string.change), new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                if(edHeight.getText().toString().equals("") || edWidth.getText().toString().equals("")){
+                    Toast.makeText(EditPictureActivity.this, getString(R.string.error_input_blank), Toast.LENGTH_SHORT).show();
+                } else if (Integer.valueOf(edHeight.getText().toString()) < 50 || Integer.valueOf(edWidth.getText().toString()) < 50){
+                    Toast.makeText(EditPictureActivity.this, getString(R.string.width_height_50), Toast.LENGTH_SHORT).show();
+                } else if (Integer.valueOf(edHeight.getText().toString()) * Integer.valueOf(edWidth.getText().toString()) > UtilContains.MAX_PIXEL){
+                    Toast.makeText(EditPictureActivity.this, getString(R.string.file_is_large), Toast.LENGTH_SHORT).show();
+                } else {
+                    int newWidth = Integer.valueOf(edWidth.getText().toString());
+                    int newHeight = Integer.valueOf(edHeight.getText().toString());
+                    Mat mat = Convert.createMatFromBitmap(cacheBitmap);
+                    Convert.resize(mat, new Size(newWidth, newHeight));
+                    cacheBitmap = Convert.createBitmapFromMat(mat);
+                    imEditPicture.setImageBitmap(cacheBitmap);
+                }
+            }
+        });
+        builder.setNegativeButton(getString(R.string.cancel), new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.cancel();
+            }
+        });
+
+        builder.show();
+    }
+
+    private TextWatcher eventChangeSizeImage(int rootSize, int sizeChange, EditText edChange, boolean[] isChanged){
+        return new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+            }
+
+            @Override
+            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+                if(!isChanged[0] && !charSequence.toString().equals("")){
+                    isChanged[0] = true;
+                    double percent = Integer.valueOf(charSequence.toString()) * 1.0 / rootSize;
+                    int afterSize = (int) (sizeChange * percent);
+                    edChange.setText(afterSize + "");
+                }
+            }
+
+            @Override
+            public void afterTextChanged(Editable editable) {
+                isChanged[0] = false;
+            }
+        };
     }
 
     private void removeCacheClick(FeatureFunction featureFunction) {

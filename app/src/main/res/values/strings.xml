@@ -51,6 +51,13 @@
     <string name="chose_color">Chọn màu</string>
     <string name="image_chroma">Sắc độ</string>
     <string name="header_name">IMAGIC</string>
+    <string name="change">Đổi</string>
+    <string name="width">Chiều Rộng</string>
+    <string name="height">Chiều Cao</string>
+    <string name="error_input_blank">Nhập Số</string>
+    <string name="width_height_50">Lớn hơn 50x50</string>
+    <string name="file_is_large">File quá lớn</string>
+    <string name="change_size_image">Thay đổi kích cỡ hình ảnh</string>
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
 </resources>
