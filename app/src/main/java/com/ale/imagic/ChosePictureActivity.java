@@ -40,6 +40,7 @@ public class ChosePictureActivity extends AppCompatActivity {
 
         MainActivity.setFinishSetAlbum(() -> {
             setAlbum();
+            MainActivity.finishSetAlbum = null;
         });
 
         setActionView();

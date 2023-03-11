@@ -38,14 +38,14 @@ public class ImageAutoSizeAdapter extends RecyclerView.Adapter<ImageAutoSizeAdap
     public void onBindViewHolder(@NonNull ImageAutoSizeAdapter.ViewHolder holder, int position) {
         CacheImage cacheImage = cacheImages.get(position);
 
-        Handle.loadCacheImage(cacheImage, null, bitmap -> {
+//        Handle.loadCacheImage(cacheImage, null, bitmap -> {
             holder.imAutoSize.post(new Runnable() {
                 @Override
                 public void run() {
-                    holder.imAutoSize.setImageBitmap(bitmap);
+                    holder.imAutoSize.setImageBitmap(cacheImage.getBitmap());
                 }
             });
-        });
+//        });
 
         holder.imAutoSize.setOnClickListener(new View.OnClickListener() {
             @Override

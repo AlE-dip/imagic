@@ -44,6 +44,7 @@
     <string name="emboss_value">Nổi</string>
     <string name="custom">Tùy chỉnh</string>
     <string name="resize">Đổi cỡ</string>
+    <string name="crop">Cắt ảnh</string>
     <string name="download">Tải xuống</string>
     <string name="view_ads">Xem quảng cáo để tải về!</string>
     <string name="downloaded">Đã tải</string>

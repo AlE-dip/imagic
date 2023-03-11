@@ -5,6 +5,7 @@ import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import android.app.Activity;
 import android.content.Intent;
@@ -20,6 +21,8 @@ import android.view.WindowInsetsController;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 
+import com.ale.imagic.convertor.Convert;
+import com.ale.imagic.convertor.Handle;
 import com.ale.imagic.model.Album;
 import com.ale.imagic.model.adapter.ImageAutoSizeAdapter;
 import com.ale.imagic.model.cache.CacheImage;
@@ -41,6 +44,7 @@ public class MainActivity extends AppCompatActivity {
     private static boolean isSetAlbums;
     public static FinishSetAlbum finishSetAlbum;
     private RecyclerView rcImageLeft, rcImageRight;
+    private SwipeRefreshLayout wrRefreshListPreview;
 
     static {
         if (OpenCVLoader.initDebug()) {
@@ -58,9 +62,7 @@ public class MainActivity extends AppCompatActivity {
         hideSystemBar(MainActivity.this);
 
         createView();
-        isSetAlbums = false;
 
-        albums = new ArrayList<>();
         if (AskPermission.filePermission(this)) {
             startGetFile();
         }
@@ -69,38 +71,59 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void startGetFile() {
+        albums = new ArrayList<>();
+        isSetAlbums = false;
         new Thread(new Runnable() {
             @RequiresApi(api = Build.VERSION_CODES.N)
             @Override
             public void run() {
+                wrRefreshListPreview.setRefreshing(true);
                 File path = Environment.getExternalStorageDirectory();
                 getListAlbum(path, albums);
                 setFinishSetAlbum(null);
                 getSelfAlbum();
+                wrRefreshListPreview.setRefreshing(false);
             }
         }).start();
     }
 
     @RequiresApi(api = Build.VERSION_CODES.N)
     private void getSelfAlbum() {
+        int[] maxHeightLeft = {0};
+        int[] maxHeightRight = {0};
         albums.forEach(album -> {
             if(album.getName().equals(UtilContains.LOCATION)){
                 ArrayList<CacheImage> cacheImageLefts = new ArrayList<>();
                 ArrayList<CacheImage> cacheImageRights = new ArrayList<>();
                 for (int i = 0; i < album.getCacheImages().size(); i++){
                     CacheImage cacheImage = album.getCacheImages().get(i);
-                    if(i % 2 == 0){
+                    cacheImage.setBitmap(Convert.readImage(cacheImage.getPath()));
+                    if(maxHeightLeft[0] <= maxHeightRight[0]){
                         cacheImageLefts.add(cacheImage);
+                        maxHeightLeft[0] += cacheImage.getBitmap().getHeight();
                     } else {
                         cacheImageRights.add(cacheImage);
+                        maxHeightRight[0] += cacheImage.getBitmap().getHeight();
                     }
                 }
                 ImageAutoSizeAdapter imageAutoSizeAdapterLeft = new ImageAutoSizeAdapter(this, cacheImageLefts);
-                rcImageLeft.setAdapter(imageAutoSizeAdapterLeft);
-                rcImageLeft.setLayoutManager(new LinearLayoutManager(this, RecyclerView.VERTICAL, false));
+                rcImageLeft.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        rcImageLeft.setAdapter(imageAutoSizeAdapterLeft);
+                        rcImageLeft.setLayoutManager(new LinearLayoutManager(MainActivity.this, RecyclerView.VERTICAL, false));
+                    }
+                });
+
                 ImageAutoSizeAdapter imageAutoSizeAdapterRight = new ImageAutoSizeAdapter(this, cacheImageRights);
-                rcImageRight.setAdapter(imageAutoSizeAdapterRight);
-                rcImageRight.setLayoutManager(new LinearLayoutManager(this, RecyclerView.VERTICAL, false));
+                rcImageRight.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        rcImageRight.setAdapter(imageAutoSizeAdapterRight);
+                        rcImageRight.setLayoutManager(new LinearLayoutManager(MainActivity.this, RecyclerView.VERTICAL, false));
+                    }
+                });
+
             }
         });
     }
@@ -109,6 +132,7 @@ public class MainActivity extends AppCompatActivity {
         navigationBar = findViewById(R.id.navigation_bar);
         rcImageLeft = findViewById(R.id.rc_image_left);
         rcImageRight = findViewById(R.id.rc_image_right);
+        wrRefreshListPreview = findViewById(R.id.wr_refresh_list_preview);
     }
 
     private void setActionView() {
@@ -122,6 +146,14 @@ public class MainActivity extends AppCompatActivity {
                         break;
                 }
                 return true;
+            }
+        });
+
+        wrRefreshListPreview.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                startGetFile();
+                wrRefreshListPreview.setRefreshing(false);
             }
         });
     }

@@ -12,6 +12,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
@@ -29,6 +30,7 @@ import com.ale.imagic.model.ContentShare;
 import com.ale.imagic.model.adapter.FeatureAdapter;
 import com.ale.imagic.model.cache.CacheFilter;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
+import com.soundcloud.android.crop.Crop;
 
 import org.opencv.core.Mat;
 import org.opencv.core.Size;
@@ -46,8 +48,9 @@ public class EditPictureActivity extends AppCompatActivity {
     private BottomNavigationView nvOption;
     private RecyclerView rcFooter;
     private FeatureFunction featureFunctionClick;
-    private Bitmap cacheBitmap;
-    private String pathImage;
+    private static Bitmap cacheBitmap;
+    private static String pathImage;
+    private static String pathImageTemp;
 
     @RequiresApi(api = Build.VERSION_CODES.R)
     @Override
@@ -62,15 +65,23 @@ public class EditPictureActivity extends AppCompatActivity {
         pathImage = intent.getStringExtra("path");
 
         cacheBitmap = Convert.readImage(pathImage);
-        ContentShare.saveImage = Convert.createMatFromBitmap(cacheBitmap);
         imEditPicture.setImageBitmap(cacheBitmap);
 
         //
         createEvent();
 
+        ArrayList<FeatureFunction> featureFunctions = new ArrayList<>();
+        addListFeture(featureFunctions);
+
+        FeatureAdapter featureAdapter = new FeatureAdapter(this, featureFunctions);
+        rcFooter.setAdapter(featureAdapter);
+        rcFooter.setLayoutManager(new LinearLayoutManager(this, RecyclerView.HORIZONTAL, false));
+    }
+
+    @RequiresApi(api = Build.VERSION_CODES.M)
+    private void addListFeture(ArrayList<FeatureFunction> featureFunctions) {
         //footer
         //filter color
-        ArrayList<FeatureFunction> featureFunctions = new ArrayList<>();
         featureFunctions.add(new FeatureFunction(getString(R.string.filter), R.drawable.color, featureFunction -> {
             if (!featureFunction.isClick) {
                 //remove this last click
@@ -93,10 +104,49 @@ public class EditPictureActivity extends AppCompatActivity {
                 removeAllFragment(featureFunction);
             }
         }));
+        //Crop
+        featureFunctions.add(new FeatureFunction(getString(R.string.crop), R.drawable.crop, featureFunction -> {
+            if (!featureFunction.isClick) {
+                //remove this last click
+                removeCacheClick(featureFunction);
+                saveTempImage();
+                Crop.of(Uri.fromFile(new File(pathImageTemp)), Uri.fromFile(new File(pathImageTemp)))
+                        .withAspect(0, 0)
+                        .start(this);
+                //call after onActivityResult
+            } else {
+                removeAllFragment(featureFunction);
+            }
+        }));
+    }
 
-        FeatureAdapter featureAdapter = new FeatureAdapter(this, featureFunctions);
-        rcFooter.setAdapter(featureAdapter);
-        rcFooter.setLayoutManager(new LinearLayoutManager(this, RecyclerView.HORIZONTAL, false));
+    private void saveTempImage(){
+        String root = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES).toString();
+        File file = new File(root, UtilContains.LOCATION);
+        if (!file.exists()) {
+            file.mkdir();
+        }
+        File image = new File(pathImage);
+        String nameImage = UtilContains.TEMP + "_" +image.getName();
+        File imageSave = new File(file, nameImage);
+        if (imageSave.exists()) imageSave.delete();
+        Mat save = new Mat();
+        Imgproc.cvtColor(Convert.createMatFromBitmap(cacheBitmap), save, Imgproc.COLOR_RGB2BGRA);
+        Imgcodecs.imwrite(imageSave.toString(), save);
+        pathImageTemp = imageSave.toString();
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent result) {
+        super.onActivityResult(requestCode, resultCode, result);
+        if (requestCode == Crop.REQUEST_CROP && resultCode == RESULT_OK) {
+            cacheBitmap = Convert.readImage(pathImageTemp);
+            imEditPicture.setImageBitmap(cacheBitmap);
+            File file = new File(pathImageTemp);
+            if(file.exists()){
+                file.delete();
+            }
+        }
     }
 
     @RequiresApi(api = Build.VERSION_CODES.M)
@@ -218,7 +268,7 @@ public class EditPictureActivity extends AppCompatActivity {
             File imageSave = new File(file, nameImage);
             if (imageSave.exists()) imageSave.delete();
             Mat save = new Mat();
-            Imgproc.cvtColor(ContentShare.saveImage, save, Imgproc.COLOR_RGB2BGRA);
+            Imgproc.cvtColor(Convert.createMatFromBitmap(cacheBitmap), save, Imgproc.COLOR_RGB2BGRA);
             Imgcodecs.imwrite(imageSave.toString(), save);
             Toast.makeText(this, R.string.downloaded, Toast.LENGTH_LONG).show();
         });
@@ -263,5 +313,13 @@ public class EditPictureActivity extends AppCompatActivity {
 
     public interface FeatureListener {
         public void run(FeatureFunction featureFunction);
+    }
+
+    public static void setCacheImage(Bitmap cacheBitmap){
+        EditPictureActivity.cacheBitmap = cacheBitmap;
+    }
+
+    public static Bitmap getCacheImage(){
+        return EditPictureActivity.cacheBitmap;
     }
 }

@@ -5,6 +5,7 @@ import android.graphics.BitmapFactory;
 import android.graphics.PointF;
 import android.util.Log;
 
+import com.ale.imagic.EditPictureActivity;
 import com.ale.imagic.MainActivity;
 import com.ale.imagic.model.ContentShare;
 import com.ale.imagic.model.cache.CacheFilter;
@@ -128,10 +129,10 @@ public class Convert {
             Mat mat = new Mat();
             Utils.bitmapToMat(bitmap, mat);
             Mat dst = cacheFilter.getChangeImage().Filter(mat, cacheFilter.getConfigFilter());
-            ContentShare.saveImage = dst;
-            return Convert.createBitmapFromMat(dst);
+            Bitmap dstBitmap = Convert.createBitmapFromMat(dst);
+            EditPictureActivity.setCacheImage(dstBitmap);
+            return dstBitmap;
         } else {
-            Utils.bitmapToMat(bitmap, ContentShare.saveImage);
             return bitmap;
         }
     }

@@ -1,5 +1,7 @@
 package com.ale.imagic.model;
 
+import android.graphics.Bitmap;
+
 import org.opencv.core.Mat;
 
 public class ContentShare {
@@ -11,5 +13,5 @@ public class ContentShare {
     }
 
     //image after apply filter
-    public static Mat saveImage;
+
 }
