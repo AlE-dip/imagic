@@ -3,6 +3,7 @@ package com.ale.imagic;
 import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
@@ -43,7 +44,7 @@ public class MainActivity extends AppCompatActivity {
     public static ArrayList<Album> albums;
     private static boolean isSetAlbums;
     public static FinishSetAlbum finishSetAlbum;
-    private RecyclerView rcImageLeft, rcImageRight;
+    private RecyclerView rcImageLeft;
     private SwipeRefreshLayout wrRefreshListPreview;
 
     static {
@@ -99,8 +100,6 @@ public class MainActivity extends AppCompatActivity {
 
     @RequiresApi(api = Build.VERSION_CODES.N)
     private void getSelfAlbum() {
-        int[] maxHeightLeft = {0};
-        int[] maxHeightRight = {0};
         albums.forEach(album -> {
             if(album.getName().equals(UtilContains.LOCATION)){
                 ArrayList<CacheImage> cacheImageLefts = new ArrayList<>();
@@ -108,32 +107,16 @@ public class MainActivity extends AppCompatActivity {
                 for (int i = 0; i < album.getCacheImages().size(); i++){
                     CacheImage cacheImage = album.getCacheImages().get(i);
                     cacheImage.setBitmap(Convert.readImage(cacheImage.getPath()));
-                    if(maxHeightLeft[0] <= maxHeightRight[0]){
-                        cacheImageLefts.add(cacheImage);
-                        maxHeightLeft[0] += cacheImage.getBitmap().getHeight();
-                    } else {
-                        cacheImageRights.add(cacheImage);
-                        maxHeightRight[0] += cacheImage.getBitmap().getHeight();
-                    }
+                    cacheImageLefts.add(cacheImage);
                 }
                 ImageAutoSizeAdapter imageAutoSizeAdapterLeft = new ImageAutoSizeAdapter(this, cacheImageLefts);
                 rcImageLeft.post(new Runnable() {
                     @Override
                     public void run() {
                         rcImageLeft.setAdapter(imageAutoSizeAdapterLeft);
-                        rcImageLeft.setLayoutManager(new LinearLayoutManager(MainActivity.this, RecyclerView.VERTICAL, false));
+                        rcImageLeft.setLayoutManager(new GridLayoutManager(MainActivity.this, 2));
                     }
                 });
-
-                ImageAutoSizeAdapter imageAutoSizeAdapterRight = new ImageAutoSizeAdapter(this, cacheImageRights);
-                rcImageRight.post(new Runnable() {
-                    @Override
-                    public void run() {
-                        rcImageRight.setAdapter(imageAutoSizeAdapterRight);
-                        rcImageRight.setLayoutManager(new LinearLayoutManager(MainActivity.this, RecyclerView.VERTICAL, false));
-                    }
-                });
-
             }
         });
     }
@@ -141,7 +124,6 @@ public class MainActivity extends AppCompatActivity {
     private void createView() {
         navigationBar = findViewById(R.id.navigation_bar);
         rcImageLeft = findViewById(R.id.rc_image_left);
-        rcImageRight = findViewById(R.id.rc_image_right);
         wrRefreshListPreview = findViewById(R.id.wr_refresh_list_preview);
     }
 
