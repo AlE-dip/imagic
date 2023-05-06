@@ -18,6 +18,7 @@
     <string name="opacity">Độ Mờ</string>
     <string name="sigma_x">sigmaX</string>
     <string name="brightness">Độ Sáng</string>
+    <string name="brightness_darkness">Sáng/Tối</string>
     <string name="dark_image">Làm Tối</string>
     <string name="darkness">Độ Tối</string>
     <string name="delete_color">Xóa Màu</string>

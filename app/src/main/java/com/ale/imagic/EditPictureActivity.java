@@ -26,13 +26,17 @@ import android.widget.ImageView;
 import android.widget.Toast;
 
 import com.ale.imagic.convertor.Convert;
+import com.ale.imagic.model.ConfigFilter;
 import com.ale.imagic.model.ContentShare;
+import com.ale.imagic.model.adapter.ConfigFilterAdapter;
 import com.ale.imagic.model.adapter.FeatureAdapter;
 import com.ale.imagic.model.cache.CacheFilter;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.soundcloud.android.crop.Crop;
 
+import org.opencv.core.Core;
 import org.opencv.core.Mat;
+import org.opencv.core.Scalar;
 import org.opencv.core.Size;
 import org.opencv.imgcodecs.Imgcodecs;
 import org.opencv.imgproc.Imgproc;
@@ -46,7 +50,7 @@ public class EditPictureActivity extends AppCompatActivity {
     private ImageView imEditPicture, imBack, imSave;
     private FrameLayout fmConfig;
     private BottomNavigationView nvOption;
-    private RecyclerView rcFooter;
+    private RecyclerView rcFooter, rcListConfig;
     private FeatureFunction featureFunctionClick;
     private static Bitmap cacheBitmap;
     private static String pathImage;
@@ -119,8 +123,36 @@ public class EditPictureActivity extends AppCompatActivity {
             }
         }));
         //Text to image
-        featureFunctions.add(new FeatureFunction(getString(R.string.change_image), R.drawable.crop, featureFunction -> {
-            
+        featureFunctions.add(new FeatureFunction(getString(R.string.brightness_darkness), R.drawable.brightness, featureFunction -> {
+            if (!featureFunction.isClick) {
+                //remove this last click
+                removeCacheClick(featureFunction);
+                ConfigFilter lightDark = new ConfigFilter();
+                lightDark.createSeekBar(0, -255, 255, getString(R.string.brightness_darkness));
+                ConfigFilterAdapter configFilterAdapter = new ConfigFilterAdapter(EditPictureActivity.this, new CacheFilter(
+                        getString(R.string.brightness_darkness),
+                        lightDark,
+                        (mat, configFilter) -> {
+                            Mat dst = new Mat(mat.size(), mat.type());
+                            int value = configFilter.seekBars.get(0).value;
+                            if(value > 0){
+                                Core.add(mat, new Scalar(value, value, value), dst);
+                            } else if(value < 0){
+                                value *= -1;
+                                Core.subtract(mat, new Scalar(value, value, value), dst);
+                            }
+                            return dst;
+                        }),
+                        imEditPicture,
+                        cacheBitmap
+                );
+                rcListConfig.setVisibility(View.VISIBLE);
+                rcListConfig.setAdapter(configFilterAdapter);
+                rcListConfig.setLayoutManager(new LinearLayoutManager(EditPictureActivity.this, LinearLayoutManager.VERTICAL, false));
+            } else {
+                removeAllFragment(featureFunction);
+                rcListConfig.setVisibility(View.GONE);
+            }
         }));
 
     }
@@ -296,6 +328,7 @@ public class EditPictureActivity extends AppCompatActivity {
         imBack = findViewById(R.id.im_back);
         rcFooter = findViewById(R.id.rc_footer);
         imSave = findViewById(R.id.im_save);
+        rcListConfig = findViewById(R.id.rc_list_config);
     }
 
     public class FeatureFunction {

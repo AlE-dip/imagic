@@ -55,11 +55,21 @@
         app:layout_constraintTop_toBottomOf="@id/ct_head"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintBottom_toTopOf="@+id/fmConfig"
+        app:layout_constraintBottom_toTopOf="@+id/rc_list_config"
         android:layout_marginTop="2dp"
         android:layout_marginBottom="2dp"
         android:layout_width="match_parent"
         android:layout_height="0dp"/>
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:visibility="gone"
+        android:background="#A9817373"
+        android:id="@+id/rc_list_config"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintBottom_toTopOf="@+id/fmConfig"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"/>
 
     <FrameLayout
         android:id="@+id/fmConfig"
