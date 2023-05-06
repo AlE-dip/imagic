@@ -77,12 +77,22 @@ public class MainActivity extends AppCompatActivity {
             @RequiresApi(api = Build.VERSION_CODES.N)
             @Override
             public void run() {
-                wrRefreshListPreview.setRefreshing(true);
+                wrRefreshListPreview.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        wrRefreshListPreview.setRefreshing(true);
+                    }
+                });
                 File path = Environment.getExternalStorageDirectory();
                 getListAlbum(path, albums);
                 setFinishSetAlbum(null);
                 getSelfAlbum();
-                wrRefreshListPreview.setRefreshing(false);
+                wrRefreshListPreview.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        wrRefreshListPreview.setRefreshing(false);
+                    }
+                });
             }
         }).start();
     }

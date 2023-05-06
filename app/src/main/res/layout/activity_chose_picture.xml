@@ -6,49 +6,63 @@
     android:layout_height="match_parent"
     tools:context=".ChosePictureActivity">
 
-    <ImageView
-        android:id="@+id/imBack"
-        android:background="@drawable/image_button_click"
-        app:layout_constraintTop_toTopOf="@+id/ctAlbum"
-        app:layout_constraintBottom_toBottomOf="@+id/ctAlbum"
-        app:layout_constraintLeft_toLeftOf="parent"
-        android:layout_marginLeft="10dp"
-        android:src="@drawable/left_arrow_black"
-        android:layout_width="40dp"
-        android:layout_height="40dp"/>
-
     <androidx.constraintlayout.widget.ConstraintLayout
-        android:id="@+id/ctAlbum"
-        app:layout_constraintLeft_toRightOf="@+id/imBack"
+        android:id="@+id/ct_header"
         app:layout_constraintTop_toTopOf="parent"
-        android:layout_marginTop="20dp"
-        android:layout_marginLeft="10dp"
-        android:background="@drawable/chip"
-        android:layout_width="wrap_content"
+        android:padding="15dp"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
-        <TextView
-            android:id="@+id/txTitleAlbum"
-            android:text="@string/all_albums"
-            android:textSize="15sp"
-            android:textAlignment="center"
-            app:layout_constraintLeft_toLeftOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"/>
-
         <ImageView
-            app:layout_constraintTop_toTopOf="@+id/txTitleAlbum"
-            app:layout_constraintBottom_toBottomOf="@+id/txTitleAlbum"
-            app:layout_constraintLeft_toRightOf="@+id/txTitleAlbum"
-            android:id="@+id/imDirection"
-            android:src="@drawable/down"
-            android:layout_marginTop="2dp"
-            android:layout_marginLeft="5dp"
-            android:layout_width="10dp"
-            android:layout_height="10dp"/>
+            android:id="@+id/imBack"
+            android:background="@drawable/image_button_click"
+            app:layout_constraintTop_toTopOf="@+id/ctAlbum"
+            app:layout_constraintBottom_toBottomOf="@+id/ctAlbum"
+            app:layout_constraintLeft_toLeftOf="parent"
+            android:src="@drawable/left_arrow_black"
+            android:layout_width="40dp"
+            android:layout_height="40dp"/>
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/ctAlbum"
+            app:layout_constraintLeft_toRightOf="@+id/imBack"
+            app:layout_constraintTop_toTopOf="parent"
+            android:layout_marginLeft="10dp"
+            android:background="@drawable/chip"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content">
+
+            <TextView
+                android:id="@+id/txTitleAlbum"
+                android:text="@string/all_albums"
+                android:textSize="15sp"
+                android:textAlignment="center"
+                app:layout_constraintLeft_toLeftOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"/>
+
+            <ImageView
+                app:layout_constraintTop_toTopOf="@+id/txTitleAlbum"
+                app:layout_constraintBottom_toBottomOf="@+id/txTitleAlbum"
+                app:layout_constraintLeft_toRightOf="@+id/txTitleAlbum"
+                android:id="@+id/imDirection"
+                android:src="@drawable/down"
+                android:layout_marginTop="2dp"
+                android:layout_marginLeft="5dp"
+                android:layout_width="10dp"
+                android:layout_height="10dp"/>
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
 
     </androidx.constraintlayout.widget.ConstraintLayout>
+    <ImageView
+        android:src="#CACACA"
+        android:layout_marginLeft="15dp"
+        android:layout_marginRight="15dp"
+        app:layout_constraintTop_toBottomOf="@id/ct_header"
+        android:layout_width="match_parent"
+        android:layout_height="1dp"/>
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/rcListImage"
@@ -58,7 +72,7 @@
         android:layout_marginBottom="10dp"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/ctAlbum"
+        app:layout_constraintTop_toBottomOf="@+id/ct_header"
         app:layout_constraintBottom_toBottomOf="parent"
         android:layout_width="match_parent"
         android:layout_height="0dp"/>
@@ -67,7 +81,7 @@
         android:id="@+id/ctListAlbum"
         android:visibility="gone"
         android:layout_marginTop="40dp"
-        app:layout_constraintTop_toBottomOf="@+id/ctAlbum"
+        app:layout_constraintTop_toBottomOf="@+id/ct_header"
         app:layout_constraintBottom_toBottomOf="parent"
         android:background="#81818181"
         android:layout_width="match_parent"

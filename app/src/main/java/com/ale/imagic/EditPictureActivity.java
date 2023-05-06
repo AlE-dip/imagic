@@ -118,6 +118,11 @@ public class EditPictureActivity extends AppCompatActivity {
                 removeAllFragment(featureFunction);
             }
         }));
+        //Text to image
+        featureFunctions.add(new FeatureFunction(getString(R.string.change_image), R.drawable.crop, featureFunction -> {
+            
+        }));
+
     }
 
     private void saveTempImage(){
