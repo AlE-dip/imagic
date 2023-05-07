@@ -47,6 +47,10 @@ import java.util.List;
 
 public class EditPictureActivity extends AppCompatActivity {
 
+    private static final int ALL_VIEW = 0;
+    private static final int LIST_CONFIG_VIEW = 1;
+    private static final int FRAGMENT_VIEW = 2;
+
     private ImageView imEditPicture, imBack, imSave;
     private FrameLayout fmConfig;
     private BottomNavigationView nvOption;
@@ -87,30 +91,32 @@ public class EditPictureActivity extends AppCompatActivity {
         //footer
         //filter color
         featureFunctions.add(new FeatureFunction(getString(R.string.filter), R.drawable.color, featureFunction -> {
-            if (!featureFunction.isClick) {
+            if (!featureFunction.isClick()) {
                 //remove this last click
                 removeCacheClick(featureFunction);
 
                 CacheFilter cacheFilter = new CacheFilter();
                 ListFilterFragment listFilterFragment = new ListFilterFragment(EditPictureActivity.this, cacheBitmap, cacheFilter, imEditPicture);
                 addFragment(featureFunction, listFilterFragment);
+                featureFunctionClick = featureFunction;
             } else {
-                removeAllFragment(featureFunction);
+                removeAllFragment(featureFunction, ALL_VIEW);
             }
         }));
         //resize
         featureFunctions.add(new FeatureFunction(getString(R.string.resize), R.drawable.resize, featureFunction -> {
-            if (!featureFunction.isClick) {
+            if (!featureFunction.isClick()) {
                 //remove this last click
                 removeCacheClick(featureFunction);
                 addResizeDialog();
+                featureFunctionClick = featureFunction;
             } else {
-                removeAllFragment(featureFunction);
+                removeAllFragment(featureFunction, ALL_VIEW);
             }
         }));
         //Crop
         featureFunctions.add(new FeatureFunction(getString(R.string.crop), R.drawable.crop, featureFunction -> {
-            if (!featureFunction.isClick) {
+            if (!featureFunction.isClick()) {
                 //remove this last click
                 removeCacheClick(featureFunction);
                 saveTempImage();
@@ -118,13 +124,14 @@ public class EditPictureActivity extends AppCompatActivity {
                         .withAspect(0, 0)
                         .start(this);
                 //call after onActivityResult
+                featureFunctionClick = featureFunction;
             } else {
-                removeAllFragment(featureFunction);
+                removeAllFragment(featureFunction, ALL_VIEW);
             }
         }));
         //Text to image
         featureFunctions.add(new FeatureFunction(getString(R.string.brightness_darkness), R.drawable.brightness, featureFunction -> {
-            if (!featureFunction.isClick) {
+            if (!featureFunction.isClick()) {
                 //remove this last click
                 removeCacheClick(featureFunction);
                 ConfigFilter lightDark = new ConfigFilter();
@@ -149,9 +156,9 @@ public class EditPictureActivity extends AppCompatActivity {
                 rcListConfig.setVisibility(View.VISIBLE);
                 rcListConfig.setAdapter(configFilterAdapter);
                 rcListConfig.setLayoutManager(new LinearLayoutManager(EditPictureActivity.this, LinearLayoutManager.VERTICAL, false));
+                featureFunctionClick = featureFunction;
             } else {
-                removeAllFragment(featureFunction);
-                rcListConfig.setVisibility(View.GONE);
+                removeAllFragment(featureFunction, ALL_VIEW);
             }
         }));
 
@@ -274,17 +281,28 @@ public class EditPictureActivity extends AppCompatActivity {
         FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
         fragmentTransaction.replace(R.id.fmConfig, listFilterFragment);
         fragmentTransaction.commit();
-        featureFunction.isClick = true;
-        //cache function
-        featureFunctionClick = featureFunction;
     }
 
-    private void removeAllFragment(FeatureFunction featureFunction) {
+    private void removeAllFragment(FeatureFunction featureFunction, int type) {
         List<Fragment> fragList = getSupportFragmentManager().getFragments();
-        for (Fragment fragment : fragList) {
-            getSupportFragmentManager().beginTransaction().remove(fragment).commit();
+        switch (type) {
+            case ALL_VIEW:
+                for (Fragment fragment : fragList) {
+                    getSupportFragmentManager().beginTransaction().remove(fragment).commit();
+                }
+                featureFunction.isClick = false;
+                rcListConfig.setVisibility(View.GONE);
+                break;
+            case LIST_CONFIG_VIEW:
+                rcListConfig.setVisibility(View.GONE);
+                break;
+            case FRAGMENT_VIEW:
+                for (Fragment fragment : fragList) {
+                    getSupportFragmentManager().beginTransaction().remove(fragment).commit();
+                }
+                featureFunction.isClick = false;
+                break;
         }
-        featureFunction.isClick = false;
     }
 
     private void saveImage() {
@@ -332,7 +350,7 @@ public class EditPictureActivity extends AppCompatActivity {
     }
 
     public class FeatureFunction {
-        public boolean isClick;
+        private boolean isClick;
         public String name;
         public int resource;
         public FeatureListener featureListener;
@@ -346,6 +364,15 @@ public class EditPictureActivity extends AppCompatActivity {
 
         public void execute() {
             featureListener.run(this);
+        }
+
+        public boolean isClick() {
+            if(!isClick){
+                isClick = true;
+                //cache function
+                return false;
+            }
+            return true;
         }
     }
 
