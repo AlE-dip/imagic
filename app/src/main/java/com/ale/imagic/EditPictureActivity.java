@@ -44,6 +44,7 @@ import org.opencv.imgproc.Imgproc;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Stack;
 
 public class EditPictureActivity extends AppCompatActivity {
 
@@ -51,7 +52,8 @@ public class EditPictureActivity extends AppCompatActivity {
     private static final int LIST_CONFIG_VIEW = 1;
     private static final int FRAGMENT_VIEW = 2;
 
-    private ImageView imEditPicture, imBack, imSave;
+    private ImageView imEditPicture, imBack, imDownload, imUndo, imPredo;
+    private static ImageView imSave;
     private FrameLayout fmConfig;
     private BottomNavigationView nvOption;
     private RecyclerView rcFooter, rcListConfig;
@@ -59,6 +61,7 @@ public class EditPictureActivity extends AppCompatActivity {
     private static Bitmap cacheBitmap;
     private static String pathImage;
     private static String pathImageTemp;
+    public Stack<Bitmap> stCacheBitmap, stPredoBitmap;
 
     @RequiresApi(api = Build.VERSION_CODES.R)
     @Override
@@ -72,8 +75,10 @@ public class EditPictureActivity extends AppCompatActivity {
         Intent intent = getIntent();
         pathImage = intent.getStringExtra("path");
 
-        cacheBitmap = Convert.readImage(pathImage);
-        imEditPicture.setImageBitmap(cacheBitmap);
+        stCacheBitmap = new Stack<>();
+        stPredoBitmap = new Stack<>();
+        pushCacheBitmap(Convert.readImage(pathImage));
+        imEditPicture.setImageBitmap(peekBitmap());
 
         //
         createEvent();
@@ -96,7 +101,7 @@ public class EditPictureActivity extends AppCompatActivity {
                 removeCacheClick(featureFunction);
 
                 CacheFilter cacheFilter = new CacheFilter();
-                ListFilterFragment listFilterFragment = new ListFilterFragment(EditPictureActivity.this, cacheBitmap, cacheFilter, imEditPicture);
+                ListFilterFragment listFilterFragment = new ListFilterFragment(EditPictureActivity.this, stCacheBitmap, cacheFilter, imEditPicture);
                 addFragment(featureFunction, listFilterFragment);
                 featureFunctionClick = featureFunction;
             } else {
@@ -105,18 +110,17 @@ public class EditPictureActivity extends AppCompatActivity {
         }));
         //resize
         featureFunctions.add(new FeatureFunction(getString(R.string.resize), R.drawable.resize, featureFunction -> {
-            if (!featureFunction.isClick()) {
+            if (!featureFunction.isClick) {
                 //remove this last click
                 removeCacheClick(featureFunction);
                 addResizeDialog();
-                featureFunctionClick = featureFunction;
             } else {
                 removeAllFragment(featureFunction, ALL_VIEW);
             }
         }));
         //Crop
         featureFunctions.add(new FeatureFunction(getString(R.string.crop), R.drawable.crop, featureFunction -> {
-            if (!featureFunction.isClick()) {
+            if (!featureFunction.isClick) {
                 //remove this last click
                 removeCacheClick(featureFunction);
                 saveTempImage();
@@ -124,7 +128,6 @@ public class EditPictureActivity extends AppCompatActivity {
                         .withAspect(0, 0)
                         .start(this);
                 //call after onActivityResult
-                featureFunctionClick = featureFunction;
             } else {
                 removeAllFragment(featureFunction, ALL_VIEW);
             }
@@ -151,7 +154,7 @@ public class EditPictureActivity extends AppCompatActivity {
                             return dst;
                         }),
                         imEditPicture,
-                        cacheBitmap
+                        stCacheBitmap
                 );
                 rcListConfig.setVisibility(View.VISIBLE);
                 rcListConfig.setAdapter(configFilterAdapter);
@@ -175,7 +178,7 @@ public class EditPictureActivity extends AppCompatActivity {
         File imageSave = new File(file, nameImage);
         if (imageSave.exists()) imageSave.delete();
         Mat save = new Mat();
-        Imgproc.cvtColor(Convert.createMatFromBitmap(cacheBitmap), save, Imgproc.COLOR_RGB2BGRA);
+        Imgproc.cvtColor(Convert.createMatFromBitmap(stCacheBitmap.peek()), save, Imgproc.COLOR_RGB2BGRA);
         Imgcodecs.imwrite(imageSave.toString(), save);
         pathImageTemp = imageSave.toString();
     }
@@ -184,8 +187,8 @@ public class EditPictureActivity extends AppCompatActivity {
     protected void onActivityResult(int requestCode, int resultCode, Intent result) {
         super.onActivityResult(requestCode, resultCode, result);
         if (requestCode == Crop.REQUEST_CROP && resultCode == RESULT_OK) {
-            cacheBitmap = Convert.readImage(pathImageTemp);
-            imEditPicture.setImageBitmap(cacheBitmap);
+            pushCacheBitmap(Convert.readImage(pathImageTemp));
+            imEditPicture.setImageBitmap(stCacheBitmap.peek());
             File file = new File(pathImageTemp);
             if(file.exists()){
                 file.delete();
@@ -195,8 +198,9 @@ public class EditPictureActivity extends AppCompatActivity {
 
     @RequiresApi(api = Build.VERSION_CODES.M)
     private void addResizeDialog() {
-        int width = cacheBitmap.getWidth();
-        int height = cacheBitmap.getHeight();
+        Bitmap bitmap = peekBitmap();
+        int width = bitmap.getWidth();
+        int height = bitmap.getHeight();
         boolean[] isChanged = {false};
 
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
@@ -228,10 +232,10 @@ public class EditPictureActivity extends AppCompatActivity {
                 } else {
                     int newWidth = Integer.valueOf(edWidth.getText().toString());
                     int newHeight = Integer.valueOf(edHeight.getText().toString());
-                    Mat mat = Convert.createMatFromBitmap(cacheBitmap);
+                    Mat mat = Convert.createMatFromBitmap(peekBitmap());
                     Convert.resize(mat, new Size(newWidth, newHeight));
-                    cacheBitmap = Convert.createBitmapFromMat(mat);
-                    imEditPicture.setImageBitmap(cacheBitmap);
+                    pushCacheBitmap(Convert.createBitmapFromMat(mat));
+                    imEditPicture.setImageBitmap(peekBitmap());
                 }
             }
         });
@@ -323,7 +327,7 @@ public class EditPictureActivity extends AppCompatActivity {
             File imageSave = new File(file, nameImage);
             if (imageSave.exists()) imageSave.delete();
             Mat save = new Mat();
-            Imgproc.cvtColor(Convert.createMatFromBitmap(cacheBitmap), save, Imgproc.COLOR_RGB2BGRA);
+            Imgproc.cvtColor(Convert.createMatFromBitmap(peekBitmap()), save, Imgproc.COLOR_RGB2BGRA);
             Imgcodecs.imwrite(imageSave.toString(), save);
             Toast.makeText(this, R.string.downloaded, Toast.LENGTH_LONG).show();
         });
@@ -335,8 +339,38 @@ public class EditPictureActivity extends AppCompatActivity {
             finish();
         });
 
-        imSave.setOnClickListener(view -> {
+        imDownload.setOnClickListener(view -> {
             saveImage();
+        });
+
+        imUndo.setOnClickListener(view -> {
+            Bitmap bitmap = stCacheBitmap.pop();
+            imEditPicture.setImageBitmap(stCacheBitmap.peek());
+            stPredoBitmap.push(bitmap);
+            if(stPredoBitmap.size() > 0){
+                imPredo.setVisibility(View.VISIBLE);
+            }
+            if(stCacheBitmap.size() == 1){
+                imUndo.setVisibility(View.GONE);
+            }
+        });
+
+        imPredo.setOnClickListener(view -> {
+            Bitmap bitmap = stPredoBitmap.pop();
+            stCacheBitmap.push(bitmap);
+            imEditPicture.setImageBitmap(stCacheBitmap.peek());
+            if(stCacheBitmap.size() > 1){
+                imUndo.setVisibility(View.VISIBLE);
+            }
+            if(stPredoBitmap.size() == 0){
+                imPredo.setVisibility(View.GONE);
+            }
+        });
+
+        imSave.setOnClickListener(view -> {
+            pushCacheBitmap(cacheBitmap);
+            cacheBitmap = null;
+            imSave.setVisibility(View.GONE);
         });
     }
 
@@ -345,8 +379,11 @@ public class EditPictureActivity extends AppCompatActivity {
         fmConfig = findViewById(R.id.fmConfig);
         imBack = findViewById(R.id.im_back);
         rcFooter = findViewById(R.id.rc_footer);
-        imSave = findViewById(R.id.im_save);
+        imDownload = findViewById(R.id.im_download);
         rcListConfig = findViewById(R.id.rc_list_config);
+        imSave = findViewById(R.id.im_save);
+        imUndo = findViewById(R.id.im_undo);
+        imPredo = findViewById(R.id.im_predo);
     }
 
     public class FeatureFunction {
@@ -382,9 +419,37 @@ public class EditPictureActivity extends AppCompatActivity {
 
     public static void setCacheImage(Bitmap cacheBitmap){
         EditPictureActivity.cacheBitmap = cacheBitmap;
+        imSave.setVisibility(View.VISIBLE);
     }
 
     public static Bitmap getCacheImage(){
         return EditPictureActivity.cacheBitmap;
+    }
+    
+    public void pushCacheBitmap(Bitmap bitmap){
+        if(stCacheBitmap.size() >= 5){
+            stCacheBitmap.remove(0);
+        }
+        stCacheBitmap.push(bitmap);
+        if(stCacheBitmap.size() > 1){
+            imUndo.setVisibility(View.VISIBLE);
+        }
+        stPredoBitmap.clear();
+        imPredo.setVisibility(View.GONE);
+    }
+
+    public Bitmap peekBitmap(){
+        return stCacheBitmap.peek();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        if(pathImageTemp != null){
+            File file = new File(pathImageTemp);
+            if(file.exists()){
+                file.delete();
+            }
+        }
     }
 }

@@ -24,6 +24,9 @@ import java.util.List;
 
 public class Convert {
 
+    public static final int SAVE_EFFECT = 0;
+    public static final int NOT_SAVE_EFFECT = 1;
+
     public static Bitmap readImageMatToBitmap(String path) {
         Mat mat = Imgcodecs.imread(path, Imgcodecs.IMREAD_UNCHANGED);
         if (mat.cols() <= 0 || mat.rows() <= 0) {
@@ -124,13 +127,15 @@ public class Convert {
         Imgproc.resize(mat, mat, size);
     }
 
-    public static Bitmap applyEffect(CacheFilter cacheFilter, Bitmap bitmap) {
+    public static Bitmap applyEffect(CacheFilter cacheFilter, Bitmap bitmap, int type) {
         if (cacheFilter.getChangeImage() != null) {
             Mat mat = new Mat();
             Utils.bitmapToMat(bitmap, mat);
             Mat dst = cacheFilter.getChangeImage().Filter(mat, cacheFilter.getConfigFilter());
             Bitmap dstBitmap = Convert.createBitmapFromMat(dst);
-            EditPictureActivity.setCacheImage(dstBitmap);
+            if(type == SAVE_EFFECT){
+                EditPictureActivity.setCacheImage(dstBitmap);
+            }
             return dstBitmap;
         } else {
             return bitmap;

@@ -34,21 +34,22 @@ import org.opencv.imgproc.Imgproc;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Stack;
 
 public class ListFilterFragment extends Fragment {
 
     private Context context;
     private ArrayList<CacheFilter> cacheFilters;
-    private Bitmap cacheBitmap;
+    private Stack<Bitmap> stCacheBitmap;
     private RecyclerView rcListFilter, rcListConfig;
     private ListFilterAdapter listFilterAdapter;
     private ImageView imageView;
     private CacheFilter cacheFilter;
     private Mat avatar;
 
-    public ListFilterFragment(Context context, Bitmap cacheBitmap, CacheFilter cacheFilter, ImageView imageView) {
+    public ListFilterFragment(Context context, Stack<Bitmap> stCacheBitmap, CacheFilter cacheFilter, ImageView imageView) {
         this.context = context;
-        this.cacheBitmap = cacheBitmap;
+        this.stCacheBitmap = stCacheBitmap;
         this.imageView = imageView;
         this.cacheFilter = cacheFilter;
         createOperations();
@@ -300,7 +301,7 @@ public class ListFilterFragment extends Fragment {
 
         rcListFilter = view.findViewById(R.id.rcListFilter);
         rcListConfig = view.findViewById(R.id.rcListConfig);
-        listFilterAdapter = new ListFilterAdapter(cacheFilters, cacheFilter, context, cacheBitmap, imageView, rcListConfig);
+        listFilterAdapter = new ListFilterAdapter(cacheFilters, cacheFilter, context, stCacheBitmap, imageView, rcListConfig);
         rcListFilter.setAdapter(listFilterAdapter);
         rcListFilter.setLayoutManager(new LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false));
     }

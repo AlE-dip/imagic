@@ -18,22 +18,23 @@ import com.ale.imagic.convertor.Convert;
 import com.ale.imagic.model.cache.CacheFilter;
 
 import java.util.ArrayList;
+import java.util.Stack;
 
 public class ListFilterAdapter extends RecyclerView.Adapter<ListFilterAdapter.ViewHolder> {
 
     private ArrayList<CacheFilter> cacheFilters;
     private Context context;
     private ImageView imageView;
-    private Bitmap bitmap;
+    private Stack<Bitmap> stCacheBitmap;
     private ViewHolder cacheViewClick;
     private RecyclerView rcListConfig;
     public CacheFilter cacheFilter;
 
-    public ListFilterAdapter(ArrayList<CacheFilter> cacheFilters, CacheFilter cacheFilter, Context context, Bitmap bitmap, ImageView imageView, RecyclerView rcListConfig) {
+    public ListFilterAdapter(ArrayList<CacheFilter> cacheFilters, CacheFilter cacheFilter, Context context, Stack<Bitmap> stCacheBitmap, ImageView imageView, RecyclerView rcListConfig) {
         this.cacheFilters = cacheFilters;
         this.context = context;
         this.imageView = imageView;
-        this.bitmap = bitmap;
+        this.stCacheBitmap = stCacheBitmap;
         this.rcListConfig = rcListConfig;
         this.cacheFilter = cacheFilter;
     }
@@ -53,10 +54,10 @@ public class ListFilterAdapter extends RecyclerView.Adapter<ListFilterAdapter.Vi
         holder.imImage.setImageResource(R.color.black);
         holder.txName.setText(cacheFilter.getName());
         holder.ctConfig.setVisibility(View.GONE);
-        holder.imImage.setImageBitmap(Convert.applyEffect(cacheFilter, bitmap));
+        holder.imImage.setImageBitmap(Convert.applyEffect(cacheFilter, stCacheBitmap.peek(), Convert.NOT_SAVE_EFFECT));
 
         holder.imImage.setOnClickListener((view) -> {
-            imageView.setImageBitmap(Convert.applyEffect(cacheFilter, bitmap));
+            imageView.setImageBitmap(Convert.applyEffect(cacheFilter, stCacheBitmap.peek(), Convert.SAVE_EFFECT));
             this.cacheFilter.setCache(cacheFilter);
             if (cacheViewClick != null && cacheViewClick.ctConfig.getVisibility() == View.VISIBLE) {
                 cacheViewClick.ctConfig.setVisibility(View.GONE);
@@ -80,7 +81,7 @@ public class ListFilterAdapter extends RecyclerView.Adapter<ListFilterAdapter.Vi
                 } else {
                     rcListConfig.setVisibility(View.VISIBLE);
                     ConfigFilterAdapter configFilterAdapter;
-                    configFilterAdapter = new ConfigFilterAdapter(context, cacheFilter, imageView, bitmap);
+                    configFilterAdapter = new ConfigFilterAdapter(context, cacheFilter, imageView, stCacheBitmap);
                     rcListConfig.setAdapter(configFilterAdapter);
                     rcListConfig.setLayoutManager(new LinearLayoutManager(context));
                 }

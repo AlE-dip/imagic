@@ -27,12 +27,48 @@
             android:layout_height="40dp"/>
 
         <ImageView
-            android:id="@+id/im_save"
+            android:visibility="gone"
+            android:id="@+id/im_undo"
+            app:layout_constraintTop_toTopOf="@+id/im_back"
+            app:layout_constraintBottom_toBottomOf="@+id/im_back"
+            app:layout_constraintLeft_toRightOf="@+id/im_back"
+            android:background="@drawable/image_button_click"
+            android:src="@drawable/undo"
+            android:layout_marginLeft="10dp"
+            android:layout_width="40dp"
+            android:layout_height="40dp"/>
+
+        <ImageView
+            android:visibility="gone"
+            android:id="@+id/im_predo"
+            app:layout_constraintTop_toTopOf="@+id/im_back"
+            app:layout_constraintBottom_toBottomOf="@+id/im_back"
+            app:layout_constraintLeft_toRightOf="@+id/im_undo"
+            android:background="@drawable/image_button_click"
+            android:src="@drawable/predo"
+            android:layout_marginLeft="10dp"
+            android:layout_width="40dp"
+            android:layout_height="40dp"/>
+
+        <ImageView
+            android:id="@+id/im_download"
             android:background="@drawable/image_button_click"
             android:src="@drawable/download"
             app:layout_constraintTop_toTopOf="@+id/im_back"
             app:layout_constraintBottom_toBottomOf="@+id/im_back"
             app:layout_constraintRight_toRightOf="parent"
+            android:layout_marginRight="10dp"
+            android:layout_width="40dp"
+            android:layout_height="40dp"/>
+
+        <ImageView
+            android:visibility="gone"
+            android:id="@+id/im_save"
+            android:background="@drawable/image_button_click"
+            android:src="@drawable/tick"
+            app:layout_constraintTop_toTopOf="@+id/im_download"
+            app:layout_constraintBottom_toBottomOf="@+id/im_download"
+            app:layout_constraintRight_toLeftOf="@+id/im_download"
             android:layout_marginRight="10dp"
             android:layout_width="40dp"
             android:layout_height="40dp"/>

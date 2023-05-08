@@ -20,18 +20,20 @@ import com.ale.imagic.model.cache.CacheFilter;
 import com.ale.imagic.R;
 import com.ale.imagic.convertor.Convert;
 
+import java.util.Stack;
+
 public class ConfigFilterAdapter extends RecyclerView.Adapter<ConfigFilterAdapter.ViewHolder> {
 
     private Context context;
     private CacheFilter cacheFilter;
     private ImageView imageView;
-    private Bitmap bitmap;
+    private Stack<Bitmap> stCacheBitmap;
 
-    public ConfigFilterAdapter(Context context, CacheFilter cacheFilter, ImageView imageView, Bitmap bitmap) {
+    public ConfigFilterAdapter(Context context, CacheFilter cacheFilter, ImageView imageView, Stack<Bitmap> stCacheBitmap) {
         this.context = context;
         this.cacheFilter = cacheFilter;
         this.imageView = imageView;
-        this.bitmap = bitmap;
+        this.stCacheBitmap = stCacheBitmap;
     }
 
     @NonNull
@@ -59,7 +61,7 @@ public class ConfigFilterAdapter extends RecyclerView.Adapter<ConfigFilterAdapte
                 @Override
                 public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
                     sb.setValue(seekBar.getProgress());
-                    imageView.setImageBitmap(Convert.applyEffect(cacheFilter, bitmap));
+                    imageView.setImageBitmap(Convert.applyEffect(cacheFilter, stCacheBitmap.peek(), Convert.SAVE_EFFECT));
                 }
 
                 @Override
@@ -76,7 +78,7 @@ public class ConfigFilterAdapter extends RecyclerView.Adapter<ConfigFilterAdapte
             holder.sbConfig.setVisibility(View.GONE);
             holder.txNameSeekBar.setVisibility(View.GONE);
             SelectionAdapter selectionAdapter;
-            selectionAdapter = new SelectionAdapter(context, cacheFilter, bitmap, imageView);
+            selectionAdapter = new SelectionAdapter(context, cacheFilter, stCacheBitmap, imageView);
             holder.rcListSelection.setAdapter(selectionAdapter);
             holder.rcListSelection.setLayoutManager(new LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false));
         }

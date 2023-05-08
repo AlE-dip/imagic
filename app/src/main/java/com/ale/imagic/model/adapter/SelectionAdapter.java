@@ -18,19 +18,21 @@ import com.ale.imagic.convertor.Convert;
 import com.ale.imagic.model.ConfigFilter;
 import com.ale.imagic.model.cache.CacheFilter;
 
+import java.util.Stack;
+
 
 public class SelectionAdapter extends RecyclerView.Adapter<SelectionAdapter.ViewHolder> {
 
     private Context context;
     private CacheFilter cacheFilter;
     private ImageView imageView;
-    private Bitmap bitmap;
+    private Stack<Bitmap> stCacheBitmap;
     private ViewHolder cacheViewCLick;
 
-    public SelectionAdapter(Context context, CacheFilter cacheFilter, Bitmap bitmap, ImageView imageView) {
+    public SelectionAdapter(Context context, CacheFilter cacheFilter, Stack<Bitmap> stCacheBitmap, ImageView imageView) {
         this.context = context;
         this.cacheFilter = cacheFilter;
-        this.bitmap = bitmap;
+        this.stCacheBitmap = stCacheBitmap;
         this.imageView = imageView;
     }
 
@@ -62,7 +64,7 @@ public class SelectionAdapter extends RecyclerView.Adapter<SelectionAdapter.View
 
                 cacheFilter.getConfigFilter().setSelected(selection.value);
 
-                imageView.setImageBitmap(Convert.applyEffect(cacheFilter, bitmap));
+                imageView.setImageBitmap(Convert.applyEffect(cacheFilter, stCacheBitmap.peek(), Convert.SAVE_EFFECT));
             }
         });
     }
