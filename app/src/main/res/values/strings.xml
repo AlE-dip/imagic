@@ -12,7 +12,7 @@
     <string name="gray_image">Ảnh Xám</string>
     <string name="gaussian_blur_image">Làm Mờ</string>
     <string name="light_balance_gamma">Làm Sáng</string>
-    <string name="default_image">Mặc Định</string>
+    <string name="default_image">Mặc định</string>
     <string name="thresh">Ngưỡng</string>
     <string name="maxval">Sáng/Tối</string>
     <string name="opacity">Độ Mờ</string>
@@ -62,6 +62,16 @@
     <string name="width_height_50">Lớn hơn 50x50</string>
     <string name="file_is_large">File quá lớn</string>
     <string name="change_size_image">Thay đổi kích cỡ hình ảnh</string>
+    <string name="contrast">Tương phản</string>
+    <string name="advance">Nâng cao</string>
+    <string name="rotate">Xoay ảnh</string>
+    <string name="flip">Lật ảnh</string>
+    <string name="flip_horizontal">Lật theo chiều ngang</string>
+    <string name="flip_vertical">Lật theo chiều dọc</string>
+    <string name="rotate_right">Xoay phải</string>
+    <string name="rotate_left">Xoay trái</string>
+    <string name="rotate_0">Xoay lên</string>
+    <string name="rotate_180">Xoay xuống</string>
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
 </resources>

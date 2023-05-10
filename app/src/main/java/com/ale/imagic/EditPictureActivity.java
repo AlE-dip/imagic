@@ -26,6 +26,7 @@ import android.widget.ImageView;
 import android.widget.Toast;
 
 import com.ale.imagic.convertor.Convert;
+import com.ale.imagic.convertor.Filter;
 import com.ale.imagic.model.ConfigFilter;
 import com.ale.imagic.model.ContentShare;
 import com.ale.imagic.model.adapter.ConfigFilterAdapter;
@@ -35,6 +36,7 @@ import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.soundcloud.android.crop.Crop;
 
 import org.opencv.core.Core;
+import org.opencv.core.CvType;
 import org.opencv.core.Mat;
 import org.opencv.core.Scalar;
 import org.opencv.core.Size;
@@ -132,26 +134,126 @@ public class EditPictureActivity extends AppCompatActivity {
                 removeAllFragment(featureFunction, ALL_VIEW);
             }
         }));
-        //Text to image
+
+        //brightness
         featureFunctions.add(new FeatureFunction(getString(R.string.brightness_darkness), R.drawable.brightness, featureFunction -> {
             if (!featureFunction.isClick()) {
                 //remove this last click
                 removeCacheClick(featureFunction);
                 ConfigFilter lightDark = new ConfigFilter();
+                lightDark.createSeekBar(-8, -20, -1, getString(R.string.advance));
                 lightDark.createSeekBar(0, -255, 255, getString(R.string.brightness_darkness));
                 ConfigFilterAdapter configFilterAdapter = new ConfigFilterAdapter(EditPictureActivity.this, new CacheFilter(
                         getString(R.string.brightness_darkness),
                         lightDark,
                         (mat, configFilter) -> {
                             Mat dst = new Mat(mat.size(), mat.type());
-                            int value = configFilter.seekBars.get(0).value;
+                            Filter.lightBalanceGamma(mat, dst, configFilter.seekBars.get(0).value / 10.0 * -1);
+
+                            int value = configFilter.seekBars.get(1).value;
                             if(value > 0){
-                                Core.add(mat, new Scalar(value, value, value), dst);
+                                Core.add(dst, new Scalar(value, value, value), dst);
                             } else if(value < 0){
                                 value *= -1;
-                                Core.subtract(mat, new Scalar(value, value, value), dst);
+                                Core.subtract(dst, new Scalar(value, value, value), dst);
                             }
                             return dst;
+                        }),
+                        imEditPicture,
+                        stCacheBitmap
+                );
+                rcListConfig.setVisibility(View.VISIBLE);
+                rcListConfig.setAdapter(configFilterAdapter);
+                rcListConfig.setLayoutManager(new LinearLayoutManager(EditPictureActivity.this, LinearLayoutManager.VERTICAL, false));
+                featureFunctionClick = featureFunction;
+            } else {
+                removeAllFragment(featureFunction, ALL_VIEW);
+            }
+        }));
+
+        //contrast
+        featureFunctions.add(new FeatureFunction(getString(R.string.contrast), R.drawable.contrast, featureFunction -> {
+            if (!featureFunction.isClick()) {
+                //remove this last click
+                removeCacheClick(featureFunction);
+                ConfigFilter lightDark = new ConfigFilter();
+                lightDark.createSeekBar(1, 0, 100, getString(R.string.contrast));
+                ConfigFilterAdapter configFilterAdapter = new ConfigFilterAdapter(EditPictureActivity.this, new CacheFilter(
+                        getString(R.string.contrast),
+                        lightDark,
+                        (mat, configFilter) -> {
+                            int value = configFilter.seekBars.get(0).value;
+                            double contrast = value / 10.0;
+                            Mat contrastAdjusted = new Mat();
+                            mat.convertTo(contrastAdjusted, -1, contrast, 0);
+                            return contrastAdjusted;
+                        }),
+                        imEditPicture,
+                        stCacheBitmap
+                );
+                rcListConfig.setVisibility(View.VISIBLE);
+                rcListConfig.setAdapter(configFilterAdapter);
+                rcListConfig.setLayoutManager(new LinearLayoutManager(EditPictureActivity.this, LinearLayoutManager.VERTICAL, false));
+                featureFunctionClick = featureFunction;
+            } else {
+                removeAllFragment(featureFunction, ALL_VIEW);
+            }
+        }));
+
+        //rotate
+        featureFunctions.add(new FeatureFunction(getString(R.string.rotate), R.drawable.rotation, featureFunction -> {
+            if (!featureFunction.isClick()) {
+                //remove this last click
+                removeCacheClick(featureFunction);
+                ConfigFilter lightDark = new ConfigFilter();
+                lightDark.createSelection(3, getString(R.string.default_image));
+                lightDark.createSelection(Core.ROTATE_90_CLOCKWISE, getString(R.string.rotate_right));
+                lightDark.createSelection(Core.ROTATE_90_COUNTERCLOCKWISE, getString(R.string.rotate_left));
+                lightDark.createSelection(Core.ROTATE_180, getString(R.string.rotate_180));
+                ConfigFilterAdapter configFilterAdapter = new ConfigFilterAdapter(EditPictureActivity.this, new CacheFilter(
+                        getString(R.string.rotate),
+                        lightDark,
+                        (mat, configFilter) -> {
+                            Mat rotated = new Mat();
+                            if(configFilter.selected == 3){
+                                return mat;
+                            }
+                            Core.rotate(mat, rotated, configFilter.selected);
+                            return rotated;
+                        }),
+                        imEditPicture,
+                        stCacheBitmap
+                );
+                rcListConfig.setVisibility(View.VISIBLE);
+                rcListConfig.setAdapter(configFilterAdapter);
+                rcListConfig.setLayoutManager(new LinearLayoutManager(EditPictureActivity.this, LinearLayoutManager.VERTICAL, false));
+                featureFunctionClick = featureFunction;
+            } else {
+                removeAllFragment(featureFunction, ALL_VIEW);
+            }
+        }));
+
+        //flip
+        featureFunctions.add(new FeatureFunction(getString(R.string.flip), R.drawable.flip, featureFunction -> {
+            if (!featureFunction.isClick()) {
+                //remove this last click
+                removeCacheClick(featureFunction);
+                ConfigFilter lightDark = new ConfigFilter();
+                lightDark.createSelection(2, getString(R.string.default_image));
+                lightDark.createSelection(0, getString(R.string.flip_vertical));
+                lightDark.createSelection(1, getString(R.string.flip_horizontal));
+
+                ConfigFilterAdapter configFilterAdapter = new ConfigFilterAdapter(EditPictureActivity.this, new CacheFilter(
+                        getString(R.string.flip),
+                        lightDark,
+                        (mat, configFilter) -> {
+                            Mat flipped = new Mat();
+                            if(configFilter.selected == 2){
+                                return mat;
+                            }
+
+                            Core.flip(mat, flipped, configFilter.selected);
+                            return flipped;
                         }),
                         imEditPicture,
                         stCacheBitmap
@@ -351,7 +453,7 @@ public class EditPictureActivity extends AppCompatActivity {
                 imPredo.setVisibility(View.VISIBLE);
             }
             if(stCacheBitmap.size() == 1){
-                imUndo.setVisibility(View.GONE);
+                imUndo.setVisibility(View.INVISIBLE);
             }
         });
 
@@ -363,14 +465,14 @@ public class EditPictureActivity extends AppCompatActivity {
                 imUndo.setVisibility(View.VISIBLE);
             }
             if(stPredoBitmap.size() == 0){
-                imPredo.setVisibility(View.GONE);
+                imPredo.setVisibility(View.INVISIBLE);
             }
         });
 
         imSave.setOnClickListener(view -> {
             pushCacheBitmap(cacheBitmap);
             cacheBitmap = null;
-            imSave.setVisibility(View.GONE);
+            imSave.setVisibility(View.INVISIBLE);
         });
     }
 
@@ -435,7 +537,7 @@ public class EditPictureActivity extends AppCompatActivity {
             imUndo.setVisibility(View.VISIBLE);
         }
         stPredoBitmap.clear();
-        imPredo.setVisibility(View.GONE);
+        imPredo.setVisibility(View.INVISIBLE);
     }
 
     public Bitmap peekBitmap(){

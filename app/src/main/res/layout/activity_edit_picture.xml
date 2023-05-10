@@ -39,7 +39,7 @@
             android:layout_height="40dp"/>
 
         <ImageView
-            android:visibility="gone"
+            android:visibility="invisible"
             android:id="@+id/im_predo"
             app:layout_constraintTop_toTopOf="@+id/im_back"
             app:layout_constraintBottom_toBottomOf="@+id/im_back"
@@ -62,7 +62,7 @@
             android:layout_height="40dp"/>
 
         <ImageView
-            android:visibility="gone"
+            android:visibility="invisible"
             android:id="@+id/im_save"
             android:background="@drawable/image_button_click"
             android:src="@drawable/tick"
@@ -98,7 +98,7 @@
         android:layout_height="0dp"/>
 
     <androidx.recyclerview.widget.RecyclerView
-        android:visibility="gone"
+        android:visibility="invisible"
         android:background="#A9817373"
         android:id="@+id/rc_list_config"
         app:layout_constraintLeft_toLeftOf="parent"
