@@ -26,6 +26,7 @@ public class Convert {
 
     public static final int SAVE_EFFECT = 0;
     public static final int NOT_SAVE_EFFECT = 1;
+    public static final int SAVE_CACHE_EFFECT = 2;
 
     public static Bitmap readImageMatToBitmap(String path) {
         Mat mat = Imgcodecs.imread(path, Imgcodecs.IMREAD_UNCHANGED);
@@ -133,8 +134,10 @@ public class Convert {
             Utils.bitmapToMat(bitmap, mat);
             Mat dst = cacheFilter.getChangeImage().Filter(mat, cacheFilter.getConfigFilter());
             Bitmap dstBitmap = Convert.createBitmapFromMat(dst);
-            if(type == SAVE_EFFECT){
+            if(type == SAVE_EFFECT && !cacheFilter.isSaveCache()){
                 EditPictureActivity.setCacheImage(dstBitmap);
+            } else if(cacheFilter.isSaveCache() && type == SAVE_EFFECT){
+                EditPictureActivity.pushCacheBitmap(dstBitmap);
             }
             return dstBitmap;
         } else {

@@ -54,8 +54,8 @@ public class EditPictureActivity extends AppCompatActivity {
     private static final int LIST_CONFIG_VIEW = 1;
     private static final int FRAGMENT_VIEW = 2;
 
-    private ImageView imEditPicture, imBack, imDownload, imUndo, imPredo;
-    private static ImageView imSave;
+    private ImageView imEditPicture, imBack, imDownload;
+    private static ImageView imSave, imUndo, imPredo;
     private FrameLayout fmConfig;
     private BottomNavigationView nvOption;
     private RecyclerView rcFooter, rcListConfig;
@@ -63,7 +63,7 @@ public class EditPictureActivity extends AppCompatActivity {
     private static Bitmap cacheBitmap;
     private static String pathImage;
     private static String pathImageTemp;
-    public Stack<Bitmap> stCacheBitmap, stPredoBitmap;
+    private static Stack<Bitmap> stCacheBitmap, stPredoBitmap;
 
     @RequiresApi(api = Build.VERSION_CODES.R)
     @Override
@@ -86,7 +86,7 @@ public class EditPictureActivity extends AppCompatActivity {
         createEvent();
 
         ArrayList<FeatureFunction> featureFunctions = new ArrayList<>();
-        addListFeture(featureFunctions);
+        addListFeature(featureFunctions);
 
         FeatureAdapter featureAdapter = new FeatureAdapter(this, featureFunctions);
         rcFooter.setAdapter(featureAdapter);
@@ -94,7 +94,7 @@ public class EditPictureActivity extends AppCompatActivity {
     }
 
     @RequiresApi(api = Build.VERSION_CODES.M)
-    private void addListFeture(ArrayList<FeatureFunction> featureFunctions) {
+    private void addListFeature(ArrayList<FeatureFunction> featureFunctions) {
         //footer
         //filter color
         featureFunctions.add(new FeatureFunction(getString(R.string.filter), R.drawable.color, featureFunction -> {
@@ -151,9 +151,9 @@ public class EditPictureActivity extends AppCompatActivity {
                             Filter.lightBalanceGamma(mat, dst, configFilter.seekBars.get(0).value / 10.0 * -1);
 
                             int value = configFilter.seekBars.get(1).value;
-                            if(value > 0){
+                            if (value > 0) {
                                 Core.add(dst, new Scalar(value, value, value), dst);
-                            } else if(value < 0){
+                            } else if (value < 0) {
                                 value *= -1;
                                 Core.subtract(dst, new Scalar(value, value, value), dst);
                             }
@@ -206,21 +206,20 @@ public class EditPictureActivity extends AppCompatActivity {
                 //remove this last click
                 removeCacheClick(featureFunction);
                 ConfigFilter lightDark = new ConfigFilter();
-                lightDark.createSelection(3, getString(R.string.default_image));
                 lightDark.createSelection(Core.ROTATE_90_CLOCKWISE, getString(R.string.rotate_right));
                 lightDark.createSelection(Core.ROTATE_90_COUNTERCLOCKWISE, getString(R.string.rotate_left));
-                lightDark.createSelection(Core.ROTATE_180, getString(R.string.rotate_180));
-                ConfigFilterAdapter configFilterAdapter = new ConfigFilterAdapter(EditPictureActivity.this, new CacheFilter(
-                        getString(R.string.rotate),
-                        lightDark,
-                        (mat, configFilter) -> {
-                            Mat rotated = new Mat();
-                            if(configFilter.selected == 3){
-                                return mat;
-                            }
-                            Core.rotate(mat, rotated, configFilter.selected);
-                            return rotated;
-                        }),
+                ConfigFilterAdapter configFilterAdapter = new ConfigFilterAdapter(
+                        EditPictureActivity.this,
+                        new CacheFilter(
+                                getString(R.string.rotate),
+                                lightDark,
+                                (mat, configFilter) -> {
+                                    Mat rotated = new Mat();
+                                    Core.rotate(mat, rotated, configFilter.selected);
+                                    return rotated;
+                                },
+                                true
+                        ),
                         imEditPicture,
                         stCacheBitmap
                 );
@@ -239,22 +238,21 @@ public class EditPictureActivity extends AppCompatActivity {
                 //remove this last click
                 removeCacheClick(featureFunction);
                 ConfigFilter lightDark = new ConfigFilter();
-                lightDark.createSelection(2, getString(R.string.default_image));
                 lightDark.createSelection(0, getString(R.string.flip_vertical));
                 lightDark.createSelection(1, getString(R.string.flip_horizontal));
 
-                ConfigFilterAdapter configFilterAdapter = new ConfigFilterAdapter(EditPictureActivity.this, new CacheFilter(
-                        getString(R.string.flip),
-                        lightDark,
-                        (mat, configFilter) -> {
-                            Mat flipped = new Mat();
-                            if(configFilter.selected == 2){
-                                return mat;
-                            }
-
-                            Core.flip(mat, flipped, configFilter.selected);
-                            return flipped;
-                        }),
+                ConfigFilterAdapter configFilterAdapter = new ConfigFilterAdapter(
+                        EditPictureActivity.this,
+                        new CacheFilter(
+                                getString(R.string.flip),
+                                lightDark,
+                                (mat, configFilter) -> {
+                                    Mat flipped = new Mat();
+                                    Core.flip(mat, flipped, configFilter.selected);
+                                    return flipped;
+                                },
+                                true
+                        ),
                         imEditPicture,
                         stCacheBitmap
                 );
@@ -269,14 +267,14 @@ public class EditPictureActivity extends AppCompatActivity {
 
     }
 
-    private void saveTempImage(){
+    private void saveTempImage() {
         String root = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES).toString();
         File file = new File(root, UtilContains.LOCATION);
         if (!file.exists()) {
             file.mkdir();
         }
         File image = new File(pathImage);
-        String nameImage = UtilContains.TEMP + "_" +image.getName();
+        String nameImage = UtilContains.TEMP + "_" + image.getName();
         File imageSave = new File(file, nameImage);
         if (imageSave.exists()) imageSave.delete();
         Mat save = new Mat();
@@ -292,7 +290,7 @@ public class EditPictureActivity extends AppCompatActivity {
             pushCacheBitmap(Convert.readImage(pathImageTemp));
             imEditPicture.setImageBitmap(stCacheBitmap.peek());
             File file = new File(pathImageTemp);
-            if(file.exists()){
+            if (file.exists()) {
                 file.delete();
             }
         }
@@ -325,11 +323,11 @@ public class EditPictureActivity extends AppCompatActivity {
         builder.setPositiveButton(getString(R.string.change), new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
-                if(edHeight.getText().toString().equals("") || edWidth.getText().toString().equals("")){
+                if (edHeight.getText().toString().equals("") || edWidth.getText().toString().equals("")) {
                     Toast.makeText(EditPictureActivity.this, getString(R.string.error_input_blank), Toast.LENGTH_SHORT).show();
-                } else if (Integer.valueOf(edHeight.getText().toString()) < 50 || Integer.valueOf(edWidth.getText().toString()) < 50){
+                } else if (Integer.valueOf(edHeight.getText().toString()) < 50 || Integer.valueOf(edWidth.getText().toString()) < 50) {
                     Toast.makeText(EditPictureActivity.this, getString(R.string.width_height_50), Toast.LENGTH_SHORT).show();
-                } else if (Integer.valueOf(edHeight.getText().toString()) * Integer.valueOf(edWidth.getText().toString()) > UtilContains.MAX_PIXEL){
+                } else if (Integer.valueOf(edHeight.getText().toString()) * Integer.valueOf(edWidth.getText().toString()) > UtilContains.MAX_PIXEL) {
                     Toast.makeText(EditPictureActivity.this, getString(R.string.file_is_large), Toast.LENGTH_SHORT).show();
                 } else {
                     int newWidth = Integer.valueOf(edWidth.getText().toString());
@@ -351,7 +349,7 @@ public class EditPictureActivity extends AppCompatActivity {
         builder.show();
     }
 
-    private TextWatcher eventChangeSizeImage(int rootSize, int sizeChange, EditText edChange, boolean[] isChanged){
+    private TextWatcher eventChangeSizeImage(int rootSize, int sizeChange, EditText edChange, boolean[] isChanged) {
         return new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
@@ -359,7 +357,7 @@ public class EditPictureActivity extends AppCompatActivity {
 
             @Override
             public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-                if(!isChanged[0] && !charSequence.toString().equals("")){
+                if (!isChanged[0] && !charSequence.toString().equals("")) {
                     isChanged[0] = true;
                     double percent = Integer.valueOf(charSequence.toString()) * 1.0 / rootSize;
                     int afterSize = (int) (sizeChange * percent);
@@ -425,7 +423,7 @@ public class EditPictureActivity extends AppCompatActivity {
                 file.mkdir();
             }
             File image = new File(pathImage);
-            String nameImage = UtilContains.LOCATION + "_" +image.getName();
+            String nameImage = UtilContains.LOCATION + "_" + image.getName();
             File imageSave = new File(file, nameImage);
             if (imageSave.exists()) imageSave.delete();
             Mat save = new Mat();
@@ -449,10 +447,10 @@ public class EditPictureActivity extends AppCompatActivity {
             Bitmap bitmap = stCacheBitmap.pop();
             imEditPicture.setImageBitmap(stCacheBitmap.peek());
             stPredoBitmap.push(bitmap);
-            if(stPredoBitmap.size() > 0){
+            if (stPredoBitmap.size() > 0) {
                 imPredo.setVisibility(View.VISIBLE);
             }
-            if(stCacheBitmap.size() == 1){
+            if (stCacheBitmap.size() == 1) {
                 imUndo.setVisibility(View.INVISIBLE);
             }
         });
@@ -461,10 +459,10 @@ public class EditPictureActivity extends AppCompatActivity {
             Bitmap bitmap = stPredoBitmap.pop();
             stCacheBitmap.push(bitmap);
             imEditPicture.setImageBitmap(stCacheBitmap.peek());
-            if(stCacheBitmap.size() > 1){
+            if (stCacheBitmap.size() > 1) {
                 imUndo.setVisibility(View.VISIBLE);
             }
-            if(stPredoBitmap.size() == 0){
+            if (stPredoBitmap.size() == 0) {
                 imPredo.setVisibility(View.INVISIBLE);
             }
         });
@@ -506,7 +504,7 @@ public class EditPictureActivity extends AppCompatActivity {
         }
 
         public boolean isClick() {
-            if(!isClick){
+            if (!isClick) {
                 isClick = true;
                 //cache function
                 return false;
@@ -519,37 +517,37 @@ public class EditPictureActivity extends AppCompatActivity {
         public void run(FeatureFunction featureFunction);
     }
 
-    public static void setCacheImage(Bitmap cacheBitmap){
+    public static void setCacheImage(Bitmap cacheBitmap) {
         EditPictureActivity.cacheBitmap = cacheBitmap;
         imSave.setVisibility(View.VISIBLE);
     }
 
-    public static Bitmap getCacheImage(){
+    public static Bitmap getCacheImage() {
         return EditPictureActivity.cacheBitmap;
     }
-    
-    public void pushCacheBitmap(Bitmap bitmap){
-        if(stCacheBitmap.size() >= 5){
+
+    public static void pushCacheBitmap(Bitmap bitmap) {
+        if (stCacheBitmap.size() >= 5) {
             stCacheBitmap.remove(0);
         }
         stCacheBitmap.push(bitmap);
-        if(stCacheBitmap.size() > 1){
+        if (stCacheBitmap.size() > 1) {
             imUndo.setVisibility(View.VISIBLE);
         }
         stPredoBitmap.clear();
         imPredo.setVisibility(View.INVISIBLE);
     }
 
-    public Bitmap peekBitmap(){
+    public Bitmap peekBitmap() {
         return stCacheBitmap.peek();
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-        if(pathImageTemp != null){
+        if (pathImageTemp != null) {
             File file = new File(pathImageTemp);
-            if(file.exists()){
+            if (file.exists()) {
                 file.delete();
             }
         }

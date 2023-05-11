@@ -12,6 +12,7 @@ public class CacheFilter {
     private Bitmap bitmap;
     private ConfigFilter configFilter;
     private IChangeImage changeImage;
+    private boolean isSaveCache = false;
 
 
     public CacheFilter(String name, ConfigFilter configFilter, IChangeImage changeImage) {
@@ -19,6 +20,14 @@ public class CacheFilter {
         this.name = name;
         this.configFilter = configFilter;
         this.changeImage = changeImage;
+    }
+
+    public CacheFilter(String name, ConfigFilter configFilter, IChangeImage changeImage, boolean isSaveCache) {
+        this.id = ContentShare.getMaxId();
+        this.name = name;
+        this.configFilter = configFilter;
+        this.changeImage = changeImage;
+        this.isSaveCache = isSaveCache;
     }
 
     public CacheFilter() {
@@ -73,5 +82,13 @@ public class CacheFilter {
 
     public void setChangeImage(IChangeImage changeImage) {
         this.changeImage = changeImage;
+    }
+
+    public boolean isSaveCache() {
+        return isSaveCache;
+    }
+
+    public void setSaveCache(boolean saveCache) {
+        isSaveCache = saveCache;
     }
 }
