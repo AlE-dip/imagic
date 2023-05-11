@@ -27,6 +27,11 @@ import com.ale.imagic.convertor.Handle;
 import com.ale.imagic.model.Album;
 import com.ale.imagic.model.adapter.ImageAutoSizeAdapter;
 import com.ale.imagic.model.cache.CacheImage;
+import com.google.android.gms.ads.AdRequest;
+import com.google.android.gms.ads.AdView;
+import com.google.android.gms.ads.MobileAds;
+import com.google.android.gms.ads.initialization.InitializationStatus;
+import com.google.android.gms.ads.initialization.OnInitializationCompleteListener;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 import org.opencv.android.OpenCVLoader;
@@ -39,6 +44,7 @@ import java.util.Queue;
 
 public class MainActivity extends AppCompatActivity {
 
+    private AdView mAdView;
     public static String FACE_DETECTION = "FaceDetection";
     private BottomNavigationView navigationBar;
     public static ArrayList<Album> albums;
@@ -61,6 +67,16 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         hideSystemBar(MainActivity.this);
+
+        MobileAds.initialize(this, new OnInitializationCompleteListener() {
+            @Override
+            public void onInitializationComplete(InitializationStatus initializationStatus) {
+
+            }
+        });
+        mAdView = findViewById(R.id.adView);
+        AdRequest adRequest = new AdRequest.Builder().build();
+        mAdView.loadAd(adRequest);
 
         createView();
 

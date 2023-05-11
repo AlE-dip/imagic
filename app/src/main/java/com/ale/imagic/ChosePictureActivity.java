@@ -16,12 +16,18 @@ import android.widget.TextView;
 import com.ale.imagic.model.adapter.AlbumAdapter;
 import com.ale.imagic.model.adapter.GridImageAdapter;
 import com.ale.imagic.model.cache.CacheImage;
+import com.google.android.gms.ads.AdRequest;
+import com.google.android.gms.ads.AdView;
+import com.google.android.gms.ads.MobileAds;
+import com.google.android.gms.ads.initialization.InitializationStatus;
+import com.google.android.gms.ads.initialization.OnInitializationCompleteListener;
 
 import java.util.ArrayList;
 
 
 public class ChosePictureActivity extends AppCompatActivity {
 
+    private AdView mAdView;
     private TextView txAlbum;
     public ConstraintLayout ctListAlbum, ctTitleAlbum;
     public RecyclerView rcListAlbum, rcListImage;
@@ -35,6 +41,16 @@ public class ChosePictureActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_chose_picture);
         MainActivity.hideSystemBar(ChosePictureActivity.this);
+
+        MobileAds.initialize(this, new OnInitializationCompleteListener() {
+            @Override
+            public void onInitializationComplete(InitializationStatus initializationStatus) {
+
+            }
+        });
+        mAdView = findViewById(R.id.adView);
+        AdRequest adRequest = new AdRequest.Builder().build();
+        mAdView.loadAd(adRequest);
 
         createView();
 

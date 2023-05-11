@@ -1,5 +1,6 @@
 package com.ale.imagic;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
@@ -32,6 +33,12 @@ import com.ale.imagic.model.ContentShare;
 import com.ale.imagic.model.adapter.ConfigFilterAdapter;
 import com.ale.imagic.model.adapter.FeatureAdapter;
 import com.ale.imagic.model.cache.CacheFilter;
+import com.google.android.gms.ads.AdRequest;
+import com.google.android.gms.ads.LoadAdError;
+import com.google.android.gms.ads.OnUserEarnedRewardListener;
+import com.google.android.gms.ads.rewarded.RewardItem;
+import com.google.android.gms.ads.rewarded.RewardedAd;
+import com.google.android.gms.ads.rewarded.RewardedAdLoadCallback;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.soundcloud.android.crop.Crop;
 
@@ -50,6 +57,8 @@ import java.util.Stack;
 
 public class EditPictureActivity extends AppCompatActivity {
 
+    public static final String idAds = "ca-app-pub-8329878984757230/9239034842";
+    private RewardedAd rewardedAd;
     private static final int ALL_VIEW = 0;
     private static final int LIST_CONFIG_VIEW = 1;
     private static final int FRAGMENT_VIEW = 2;
@@ -91,6 +100,41 @@ public class EditPictureActivity extends AppCompatActivity {
         FeatureAdapter featureAdapter = new FeatureAdapter(this, featureFunctions);
         rcFooter.setAdapter(featureAdapter);
         rcFooter.setLayoutManager(new LinearLayoutManager(this, RecyclerView.HORIZONTAL, false));
+    }
+
+    private void addAds() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(EditPictureActivity.this);
+        builder.setTitle(getString(R.string.ads_loading));
+        builder.setPositiveButton(getText(R.string.close), (dialogInterface, i) -> {
+            dialogInterface.dismiss();
+        });
+        AlertDialog alertDialog = builder.create();
+        alertDialog.show();
+
+        AlertDialog alertDialogDowloaded = builder.setTitle(getString(R.string.downloaded)).create();
+
+        AdRequest adRequest = new AdRequest.Builder().build();
+        RewardedAd.load(this, idAds,
+                adRequest, new RewardedAdLoadCallback() {
+                    @Override
+                    public void onAdFailedToLoad(@NonNull LoadAdError loadAdError) {
+                        rewardedAd = null;
+                        alertDialog.cancel();
+                        alertDialogDowloaded.show();
+                    }
+
+                    @Override
+                    public void onAdLoaded(@NonNull RewardedAd ad) {
+                        rewardedAd = ad;
+                        rewardedAd.show(EditPictureActivity.this, new OnUserEarnedRewardListener() {
+                            @Override
+                            public void onUserEarnedReward(@NonNull RewardItem rewardItem) {
+                                alertDialog.cancel();
+                                alertDialogDowloaded.show();
+                            }
+                        });
+                    }
+                });
     }
 
     @RequiresApi(api = Build.VERSION_CODES.M)
@@ -417,6 +461,7 @@ public class EditPictureActivity extends AppCompatActivity {
             dialogInterface.cancel();
         });
         builder.setPositiveButton(R.string.download, (dialogInterface, i) -> {
+            addAds();
             String root = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES).toString();
             File file = new File(root, UtilContains.LOCATION);
             if (!file.exists()) {
