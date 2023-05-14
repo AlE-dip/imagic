@@ -74,6 +74,10 @@
     <string name="rotate_180">Xoay xuống</string>
     <string name="ads_loading">Đang tải quảng cáo...</string>
     <string name="close">Đóng</string>
+    <string name="duplicated">Nhân đôi</string>
+    <string name="row">Hàng</string>
+    <string name="col">Cột</string>
+
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
 </resources>

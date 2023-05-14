@@ -134,7 +134,8 @@ public class EditPictureActivity extends AppCompatActivity {
                             }
                         });
                     }
-                });
+                }
+        );
     }
 
     @RequiresApi(api = Build.VERSION_CODES.M)
@@ -309,6 +310,55 @@ public class EditPictureActivity extends AppCompatActivity {
             }
         }));
 
+        //color
+        featureFunctions.add(new FeatureFunction(getString(R.string.color), R.drawable.fill, featureFunction -> {
+            if (!featureFunction.isClick()) {
+                //remove this last click
+                removeCacheClick(featureFunction);
+                ConfigFilter lightDark = new ConfigFilter();
+                lightDark.createSeekBar(0, -255, 255, getString(R.string.blue));
+                lightDark.createSeekBar(0, -255, 255, getString(R.string.green));
+                lightDark.createSeekBar(0, -255, 255, getString(R.string.red));
+                ConfigFilterAdapter configFilterAdapter = new ConfigFilterAdapter(EditPictureActivity.this, new CacheFilter(
+                        getString(R.string.color),
+                        lightDark,
+                        (mat, configFilter) -> {
+                            Mat dst = new Mat(mat.size(), mat.type());
+                            int blue = configFilter.seekBars.get(0).value;
+                            int green = configFilter.seekBars.get(1).value;
+                            int red = configFilter.seekBars.get(2).value;
+                            if (blue > 0) {
+                                Core.add(mat, new Scalar(0, 0, blue), dst);
+                            } else if (blue < 0) {
+                                blue *= -1;
+                                Core.subtract(mat, new Scalar(0, 0, blue), dst);
+                            }
+                            if (green > 0) {
+                                Core.add(dst, new Scalar(0, green, 0), dst);
+                            } else if (green < 0) {
+                                green *= -1;
+                                Core.subtract(dst, new Scalar(0, green, 0), dst);
+                            }
+                            if (red > 0) {
+                                Core.add(dst, new Scalar(red, 0, 0), dst);
+                            } else if (red < 0) {
+                                red *= -1;
+                                Core.subtract(dst, new Scalar(red, 0, 0), dst);
+                            }
+                            return dst;
+                        }),
+                        imEditPicture,
+                        stCacheBitmap
+                );
+                rcListConfig.setVisibility(View.VISIBLE);
+                rcListConfig.setAdapter(configFilterAdapter);
+                rcListConfig.setLayoutManager(new LinearLayoutManager(EditPictureActivity.this, LinearLayoutManager.VERTICAL, false));
+                featureFunctionClick = featureFunction;
+            } else {
+                removeAllFragment(featureFunction, ALL_VIEW);
+            }
+        }));
+
     }
 
     private void saveTempImage() {
@@ -451,6 +501,8 @@ public class EditPictureActivity extends AppCompatActivity {
                 featureFunction.isClick = false;
                 break;
         }
+        imEditPicture.setImageBitmap(stCacheBitmap.peek());
+        imSave.setVisibility(View.INVISIBLE);
     }
 
     private void saveImage() {

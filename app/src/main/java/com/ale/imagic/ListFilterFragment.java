@@ -91,6 +91,28 @@ public class ListFilterFragment extends Fragment {
             return dst;
         }));
 
+        //sideBySide filter
+        ConfigFilter sideBySideFilter = new ConfigFilter();
+        sideBySideFilter.createSeekBar(2, 1, 5, context.getString(R.string.row));
+        sideBySideFilter.createSeekBar(1, 1, 5, context.getString(R.string.col));
+        cacheFilters.add(new CacheFilter(context.getString(R.string.duplicated), sideBySideFilter, (mat, configFilter) -> {
+            int row = configFilter.seekBars.get(0).value;
+            int col = configFilter.seekBars.get(1).value;
+            Mat sideBySide = new Mat();
+            mat.copyTo(sideBySide);
+            List<Mat> mats = new ArrayList<>();
+            for(int j = 0; j < col; j++){
+                mats.add(sideBySide);
+            }
+            Core.hconcat(mats, sideBySide);
+            List<Mat> sideBySides = new ArrayList<>();
+            for(int i = 0; i < row; i++){
+                sideBySides.add(sideBySide);
+            }
+            Core.vconcat(sideBySides, sideBySide);
+            return sideBySide;
+        }));
+
         //Blur filter
         ConfigFilter configFilter4 = new ConfigFilter();
         configFilter4.createSeekBar(100, 1, 200, context.getString(R.string.opacity));
