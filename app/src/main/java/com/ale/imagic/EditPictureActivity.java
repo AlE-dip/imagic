@@ -323,7 +323,8 @@ public class EditPictureActivity extends AppCompatActivity {
                         getString(R.string.color),
                         lightDark,
                         (mat, configFilter) -> {
-                            Mat dst = new Mat(mat.size(), mat.type());
+                            Mat dst = new Mat();
+                            mat.copyTo(dst);
                             int blue = configFilter.seekBars.get(0).value;
                             int green = configFilter.seekBars.get(1).value;
                             int red = configFilter.seekBars.get(2).value;
