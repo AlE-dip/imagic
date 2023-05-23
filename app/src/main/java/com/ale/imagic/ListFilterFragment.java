@@ -14,6 +14,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.Toast;
 
 import com.ale.imagic.model.cache.CacheFilter;
 import com.ale.imagic.convertor.Filter;
@@ -96,21 +97,26 @@ public class ListFilterFragment extends Fragment {
         sideBySideFilter.createSeekBar(2, 1, 5, context.getString(R.string.row));
         sideBySideFilter.createSeekBar(1, 1, 5, context.getString(R.string.col));
         cacheFilters.add(new CacheFilter(context.getString(R.string.duplicated), sideBySideFilter, (mat, configFilter) -> {
-            int row = configFilter.seekBars.get(0).value;
-            int col = configFilter.seekBars.get(1).value;
-            Mat sideBySide = new Mat();
-            mat.copyTo(sideBySide);
-            List<Mat> mats = new ArrayList<>();
-            for(int j = 0; j < col; j++){
-                mats.add(sideBySide);
+            try {
+                int row = configFilter.seekBars.get(0).value;
+                int col = configFilter.seekBars.get(1).value;
+                Mat sideBySide = new Mat();
+                mat.copyTo(sideBySide);
+                List<Mat> mats = new ArrayList<>();
+                for(int j = 0; j < col; j++){
+                    mats.add(sideBySide);
+                }
+                Core.hconcat(mats, sideBySide);
+                List<Mat> sideBySides = new ArrayList<>();
+                for(int i = 0; i < row; i++){
+                    sideBySides.add(sideBySide);
+                }
+                Core.vconcat(sideBySides, sideBySide);
+                return sideBySide;
+            } catch (Exception e){
+                Toast.makeText(context, getString(R.string.image_is_large), Toast.LENGTH_LONG).show();
             }
-            Core.hconcat(mats, sideBySide);
-            List<Mat> sideBySides = new ArrayList<>();
-            for(int i = 0; i < row; i++){
-                sideBySides.add(sideBySide);
-            }
-            Core.vconcat(sideBySides, sideBySide);
-            return sideBySide;
+            return mat;
         }));
 
         //Blur filter

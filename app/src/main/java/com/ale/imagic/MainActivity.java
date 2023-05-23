@@ -119,7 +119,6 @@ public class MainActivity extends AppCompatActivity {
         albums.forEach(album -> {
             if(album.getName().equals(UtilContains.LOCATION)){
                 ArrayList<CacheImage> cacheImageLefts = new ArrayList<>();
-                ArrayList<CacheImage> cacheImageRights = new ArrayList<>();
                 for (int i = 0; i < album.getCacheImages().size(); i++){
                     CacheImage cacheImage = album.getCacheImages().get(i);
                     cacheImage.setBitmap(Convert.readImage(cacheImage.getPath()));
